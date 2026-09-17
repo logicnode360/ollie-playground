@@ -1,0 +1,1 @@
+web: gunicorn ollie_playground.wsgi:application --bind 0.0.0.0:$PORT
