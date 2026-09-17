@@ -133,3 +133,11 @@ MAILERS = {
         'BACKEND': 'django.core.mail.backends.console.EmailBackend',
     },
 }
+
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://ollie-playground-production.up.railway.app",
+    "https://*.up.railway.app",  # Wildcard covering preview/staging builds
+    "https://*.railway.app",     # Wildcard covering legacy domains
+]
