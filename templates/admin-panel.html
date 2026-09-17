@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Panel — NDAEB Prep{% endblock %}
+
+{% block layout %}
+<style>
+  .admin-shell{display:flex; min-height:100vh;}
+  .admin-sidebar{width:230px; background:var(--ink); flex-shrink:0;}
+  .admin-sidebar .brand{color:#fff; font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:1.05rem; padding:1.2rem 1.3rem; display:block; border-bottom:1px solid rgba(255,255,255,.1);}
+  .admin-sidebar a.nav-item{color:#B9C7C9; text-decoration:none; padding:.85rem 1.3rem; display:block; font-size:.92rem; font-weight:500;}
+  .admin-sidebar a.nav-item:hover, .admin-sidebar a.nav-item.active{color:#fff; background:var(--teal-dark);}
+  .admin-main{flex:1; padding:2.2rem 2.5rem;}
+  .metric-card{border-radius:12px; padding:1.4rem; color:#fff;}
+  .metric-card h6{opacity:.85; font-size:.85rem; font-weight:600; margin-bottom:.4rem;}
+  .metric-card .val{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:2rem;}
+  @media (max-width:767px){ .admin-shell{flex-direction:column;} .admin-sidebar{width:100%;} .admin-main{padding:1.5rem;} }
+</style>
+
+<div class="admin-shell">
+  <div class="admin-sidebar">
+    <span class="brand">NDAEB Admin</span>
+    <a href="{% url 'admin_panel' %}" class="nav-item active">Payment approvals</a>
+    <a href="{% url 'dashboard' %}" class="nav-item">Return to student portal</a>
+    <a href="{% url 'logout' %}" class="nav-item">Log out</a>
+  </div>
+
+  <div class="admin-main">
+    <h2 class="fw-bold mb-4">Portal administration</h2>
+
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <div class="row g-3 mb-4">
+      <div class="col-md-4">
+        <div class="metric-card" style="background:var(--teal);">
+          <h6>Total questions</h6>
+          <div class="val">{{ total_questions|default:'0' }}</div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="metric-card" style="background:var(--ink);">
+          <h6>Enrolled students</h6>
+          <div class="val">{{ total_students|default:'0' }}</div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="metric-card" style="background:var(--coral);">
+          <h6>Pending payments</h6>
+          <div class="val">{{ pending_payments|length }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="surface-card mb-4">
+      <div class="p-4 pb-3 d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold mb-0">Pending payment verification</h5>
+        <span class="badge-soft-coral">{{ pending_payments|length }} waiting</span>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Email</th>
+              <th>Status</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for profile in pending_payments %}
+              <tr>
+                <td><strong>{{ profile.user.username }}</strong></td>
+                <td>{{ profile.user.email }}</td>
+                <td><span class="badge-soft-coral">Pending review</span></td>
+                <td class="text-end">
+                  <a href="{% url 'process_payment' profile.id 'approve' %}" class="btn btn-primary btn-sm me-2">Approve access</a>
+                  <a href="{% url 'process_payment' profile.id 'deny' %}" class="btn btn-outline-teal btn-sm">Deny access</a>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="4" class="text-center py-4" style="color:var(--slate);">No pending payment approvals at this time.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="surface-card">
+      <div class="p-4 pb-3">
+        <h5 class="fw-bold mb-0">Active / approved students</h5>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Email</th>
+              <th>Access status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for profile in approved_users %}
+              <tr>
+                <td>{{ profile.user.username }}</td>
+                <td>{{ profile.user.email }}</td>
+                <td><span class="badge-soft-teal">Approved</span></td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="3" class="text-center py-4" style="color:var(--slate);">No approved students yet.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
