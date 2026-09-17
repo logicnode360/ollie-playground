@@ -32,8 +32,12 @@ def admin_login_view(request):
 
 # --- REGULAR VIEWS ---
 def index_view(request):
-    if request.user.is_authenticated:
+    if request.user.is_staff:
+        return redirect('admin_panel')
+
+    if request.user.is_authenticated and not request.user.is_staff:
         return redirect('dashboard')
+    
     context = {
         'total_questions': Question.objects.count(),
     }
@@ -74,6 +78,9 @@ def logout_view(request):
 
 @login_required
 def dashboard_view(request):
+    if request.user.is_staff:
+        return redirect('admin_panel')
+
     attempts = ExamAttempt.objects.filter(user=request.user).order_by('-date_taken')
     attempts_count = attempts.count()
     highest_score = max([att.percentage for att in attempts], default=0)
