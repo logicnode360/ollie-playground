@@ -1,298 +1,1370 @@
-{% extends 'base.html' %}
-
-{% block title %}NDAEB Prep — Board Exam Practice for Dental Students{% endblock %}
-
-{% block layout %}
-<style>
-  .landing-nav{
-    position:sticky; top:0; z-index:1030;
-    background:rgba(251,251,249,.92);
-    backdrop-filter:blur(8px);
-    border-bottom:1px solid var(--line);
-  }
-  .landing-nav .brand{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:1.2rem; color:var(--ink); text-decoration:none; display:flex; align-items:center; gap:.5rem;}
-  .landing-nav .brand .dot{width:9px;height:9px;border-radius:50%;background:var(--coral);display:inline-block;}
-  .landing-nav .nav-link{color:var(--slate); font-weight:600; font-size:.94rem;}
-  .landing-nav .nav-link:hover{color:var(--teal-dark);}
-
-  .hero{padding:5.5rem 0 4rem;}
-  .hero h1{font-size:3rem; line-height:1.08; font-weight:700; letter-spacing:-.01em;}
-  .hero p.lead{color:var(--slate); font-size:1.15rem; max-width:34ch;}
-  .hero-stats{display:flex; gap:2.2rem; margin-top:2.2rem;}
-  .hero-stats .num{font-family:'Space Grotesk',sans-serif; font-size:1.6rem; font-weight:700; color:var(--teal-dark);}
-  .hero-stats .label{color:var(--slate); font-size:.82rem;}
-  .hero-media{position:relative;}
-  .hero-media img{width:100%; height:420px; object-fit:cover; border-radius:16px;}
-  .float-card{
-    position:absolute; left:-1.5rem; bottom:-1.5rem; background:#fff;
-    border-radius:12px; padding:1rem 1.3rem; box-shadow:0 12px 30px rgba(11,31,38,.15);
-    border-left:4px solid var(--coral); max-width:230px;
-  }
-  .float-card .num{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:1.4rem; color:var(--ink);}
-  .float-card .label{color:var(--slate); font-size:.8rem;}
-
-  section{padding:4.5rem 0;}
-  .section-tag{color:var(--coral-dark); font-weight:700; font-size:.85rem;}
-  #about img{width:100%; border-radius:16px; height:380px; object-fit:cover;}
-  #about h2{font-size:2rem; max-width:14ch;}
-  #about p{color:var(--slate); max-width:52ch;}
-
-  .service-item{border-top:3px solid var(--teal); padding:1.6rem 0 0; height:100%;}
-  .service-item h4{font-size:1.15rem;}
-  .service-item p{color:var(--slate); font-size:.95rem;}
-
-  .cta-banner{
-    background:linear-gradient(120deg, rgba(11,31,38,.92), rgba(14,124,123,.88)), url('https://images.unsplash.com/photo-1643660527090-bea721ad71f8?auto=format&fit=crop&w=1400&q=70') center/cover;
-    color:#fff; border-radius:20px; padding:3.5rem 3rem; text-align:center;
-  }
-  .cta-banner h2{color:#fff; font-size:2rem;}
-  .cta-banner p{color:#D9E8E6; max-width:48ch; margin:0 auto 1.6rem;}
-
-  footer.site-footer{background:var(--ink); color:#B9C7C9; padding:3.5rem 0 1.5rem; margin-top:3rem;}
-  footer.site-footer h6{color:#fff; font-weight:700; margin-bottom:1rem;}
-  footer.site-footer a{color:#B9C7C9; text-decoration:none; display:block; margin-bottom:.5rem; font-size:.92rem;}
-  footer.site-footer a:hover{color:#fff;}
-  footer.site-footer .brand{color:#fff; font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:1.15rem;}
-  footer.site-footer hr{border-color:rgba(255,255,255,.12); margin:2rem 0 1.2rem;}
-  .foot-bottom{font-size:.82rem; color:#7E9296; display:flex; justify-content:space-between; flex-wrap:wrap; gap:.5rem;}
-
-  .modal-content{border-radius:14px; border:none;}
-  .nav-tabs .nav-link{color:var(--slate); font-weight:600; border:none; border-bottom:2px solid transparent;}
-  .nav-tabs .nav-link.active{color:var(--teal-dark); border-bottom:2px solid var(--teal);}
-  @media (max-width:767px){
-    .hero{padding:2.5rem 0 2rem; text-align:center;}
-    .hero-stats{justify-content:center;}
-    .hero p.lead{margin-left:auto;margin-right:auto;}
-    .float-card{position:static; margin-top:1rem;}
-  }
-</style>
-
-<nav class="landing-nav py-3">
-  <div class="container container-app d-flex justify-content-between align-items-center">
-    <a class="brand" href="#home"><span class="dot"></span>NDAEB&nbsp;Prep</a>
-    <div class="d-none d-md-flex gap-4">
-      <a class="nav-link" href="#home">Home</a>
-      <a class="nav-link" href="#about">About</a>
-      <a class="nav-link" href="#services">Services</a>
-    </div>
-    <div class="d-flex gap-2">
-      <button class="btn btn-outline-teal btn-sm" data-bs-toggle="modal" data-bs-target="#authModal" data-tab="login">Log in</button>
-      <button class="btn btn-coral btn-sm" data-bs-toggle="modal" data-bs-target="#authModal" data-tab="enroll">Get started</button>
-    </div>
-  </div>
-</nav>
-
-{% if messages %}
-  <div class="container container-app pt-4">
-    {% for message in messages %}
-      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-        {{ message }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-      </div>
-    {% endfor %}
-  </div>
-{% endif %}
-
-<header id="home" class="hero">
-  <div class="container container-app">
-    <div class="row align-items-center g-5">
-      <div class="col-lg-6">
-        <h1>Walk into your NDAEB exam already knowing the room.</h1>
-        <p class="lead">Practice the National Dental Assistant Examining Board exam the way it's actually asked — timed, multiple-choice, and reviewed question by question until it sticks.</p>
-        <div class="d-flex gap-3 mt-4 flex-wrap">
-          <button class="btn btn-coral btn-lg" data-bs-toggle="modal" data-bs-target="#authModal" data-tab="enroll">Create free account</button>
-          <button class="btn btn-outline-teal btn-lg" data-bs-toggle="modal" data-bs-target="#authModal" data-tab="login">I have an account</button>
-        </div>
-        <div class="hero-stats">
-          <div>
-            <div class="num">{{ total_questions|default:"150+" }}</div>
-            <div class="label">Practice questions</div>
-          </div>
-          <div>
-            <div class="num">4</div>
-            <div class="label">Answer options, real exam style</div>
-          </div>
-          <div>
-            <div class="num">100%</div>
-            <div class="label">Explained after every attempt</div>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-6">
-        <div class="hero-media">
-          <img src="https://images.unsplash.com/photo-1593022356769-11f762e25ed9?auto=format&fit=crop&w=900&q=80" alt="Dental model used for exam preparation">
-          <div class="float-card">
-            <div class="num">Clinical, Safety &amp; Ethics</div>
-            <div class="label">Full syllabus coverage in one question bank</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</header>
-
-<section id="about">
-  <div class="container container-app">
-    <div class="row align-items-center g-5">
-      <div class="col-lg-5 order-lg-2">
-        <span class="section-tag">About the portal</span>
-        <h2 class="mt-2 mb-3">Built for dental assisting students, not test-prep in general.</h2>
-        <p>NDAEB Prep is a computer-based testing portal made for students preparing for the National Dental Assistant Examining Board assessment. Enroll, get your account activated, and work through a growing bank of board-style questions covering clinical dental assisting, safety, and professional ethics.</p>
-        <p>Every attempt is scored instantly and saved to your dashboard, so you can see exactly which sittings went well and which topics need another pass before the real exam.</p>
-      </div>
-      <div class="col-lg-7 order-lg-1">
-        <img src="https://images.unsplash.com/photo-1758270704625-cf6f1898853d?auto=format&fit=crop&w=1000&q=80" alt="Students studying together for their board exam">
-      </div>
-    </div>
-  </div>
-</section>
-
-<section id="services" style="background:var(--teal-light);">
-  <div class="container container-app">
-    <span class="section-tag">What you get</span>
-    <h2 class="mt-2 mb-5" style="max-width:30ch;">Everything between enrolling and sitting the real board exam.</h2>
-    <div class="row g-4">
-      <div class="col-md-4">
-        <div class="service-item">
-          <h4>Timed practice exams</h4>
-          <p>Sit a full multiple-choice mock exam, one question at a time, in the same format you'll face on the actual NDAEB assessment.</p>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="service-item">
-          <h4>Instant scoring &amp; explanations</h4>
-          <p>See your score the moment you submit, plus a key-note explanation for each question so mistakes turn into things you now know.</p>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="service-item">
-          <h4>Progress you can track</h4>
-          <p>Every attempt lands on your dashboard with a date, score, and pass status, so you always know if you're ready.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section>
-  <div class="container container-app">
-    <div class="cta-banner">
-      <h2>Ready to find out where you actually stand?</h2>
-      <p>Enrollment is free. Activate your account, get approved, and start practicing today.</p>
-      <button class="btn btn-coral btn-lg" data-bs-toggle="modal" data-bs-target="#authModal" data-tab="enroll">Get started</button>
-    </div>
-  </div>
-</section>
-
-<footer class="site-footer">
-  <div class="container container-app">
-    <div class="row g-4">
-      <div class="col-md-4">
-        <div class="brand mb-2">NDAEB Prep</div>
-        <p style="max-width:32ch; font-size:.92rem;">A practice portal for students preparing for the National Dental Assistant Examining Board exam.</p>
-      </div>
-      <div class="col-md-4">
-        <h6>Portal</h6>
-        <a href="#home">Home</a>
-        <a href="#about">About</a>
-        <a href="#services">Services</a>
-      </div>
-      <div class="col-md-4">
-        <h6>Account</h6>
-        <a href="#" data-bs-toggle="modal" data-bs-target="#authModal" data-tab="login">Log in</a>
-        <a href="#" data-bs-toggle="modal" data-bs-target="#authModal" data-tab="enroll">Enroll</a>
-      </div>
-    </div>
-    <hr>
-    <div class="foot-bottom">
-      <span>&copy; {% now "Y" %} NDAEB Prep. All rights reserved.</span>
-      <span>For exam preparation purposes only.</span>
-    </div>
-  </div>
-</footer>
-
-<!-- Auth Modal: Login / Enroll -->
-<div class="modal fade" id="authModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-body p-4">
-        <button type="button" class="btn-close float-end" data-bs-dismiss="modal" aria-label="Close"></button>
-        <ul class="nav nav-tabs mb-4" id="authTab" role="tablist">
-          <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="login-tab" data-bs-toggle="tab" data-bs-target="#loginPane" type="button" role="tab">Log in</button>
-          </li>
-          <li class="nav-item" role="presentation">
-            <button class="nav-link" id="enroll-tab" data-bs-toggle="tab" data-bs-target="#enrollPane" type="button" role="tab">Enroll</button>
-          </li>
-        </ul>
-        <div class="tab-content">
-          <div class="tab-pane fade show active" id="loginPane" role="tabpanel">
-            <h4 class="fw-bold mb-1">Welcome back</h4>
-            <p class="text-muted small mb-3">Log in to reach your dashboard.</p>
-            <form method="POST" action="{% url 'login' %}" id="loginForm">
-              {% csrf_token %}
-              <div class="mb-3">
-                <label class="form-label">Username</label>
-                <input type="text" name="username" class="form-control" required>
-              </div>
-              <div class="mb-4">
-                <label class="form-label">Password</label>
-                <input type="password" name="password" class="form-control" required>
-              </div>
-              <button type="submit" class="btn btn-primary w-100 py-2">Sign in</button>
-            </form>
-          </div>
-          <div class="tab-pane fade" id="enrollPane" role="tabpanel">
-            <h4 class="fw-bold mb-1">Create your account</h4>
-            <p class="text-muted small mb-3">Enroll, then complete payment to unlock the exam.</p>
-            <form method="POST" action="{% url 'enroll' %}" id="enrollForm">
-              {% csrf_token %}
-              <div class="mb-3">
-                <label class="form-label">Email address</label>
-                <input type="email" name="email" class="form-control" required>
-              </div>
-              <div class="mb-3">
-                <label class="form-label">Username</label>
-                <input type="text" name="username" class="form-control" required>
-              </div>
-              <div class="mb-4">
-                <label class="form-label">Password</label>
-                <input type="password" name="password" class="form-control" required>
-              </div>
-              <button type="submit" class="btn btn-coral w-100 py-2">Create account &amp; enroll</button>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script>
-  // Open the right tab when a "Log in" / "Get started" trigger is clicked.
-  document.querySelectorAll('[data-bs-target="#authModal"]').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      var tab = btn.getAttribute('data-tab');
-      var trigger = document.getElementById(tab === 'enroll' ? 'enroll-tab' : 'login-tab');
-      if (trigger) new bootstrap.Tab(trigger).show();
-    });
-  });
-  // Remember which form was used, so a failed attempt reopens the same tab.
-  document.getElementById('loginForm').addEventListener('submit', function () {
-    sessionStorage.setItem('ndaeb_last_tab', 'login');
-  });
-  document.getElementById('enrollForm').addEventListener('submit', function () {
-    sessionStorage.setItem('ndaeb_last_tab', 'enroll');
-  });
-  {% if messages %}
-    (function () {
-      var lastTab = sessionStorage.getItem('ndaeb_last_tab');
-      if (lastTab) {
-        var trigger = document.getElementById(lastTab === 'enroll' ? 'enroll-tab' : 'login-tab');
-        if (trigger) new bootstrap.Tab(trigger).show();
-        new bootstrap.Modal(document.getElementById('authModal')).show();
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>License Ready with Ollie | Canadian Dental Licensing &amp; Exam Preparation</title>
+    <meta name="description" content="Guidance, exam preparation, mentorship, and practical resources for internationally trained dental professionals navigating Canadian licensing pathways." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&family=Caveat:wght@600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --navy: #0f2a4c;
+        --navy-2: #12315c;
+        --navy-deep: #0a2038;
+        --gold: #e3a83b;
+        --gold-dark: #c98f22;
+        --ink: #16324a;
+        --slate: #5b6b75;
+        --line: #e3e8ec;
+        --paper: #ffffff;
+        --soft: #f4f7f9;
+        --radius: 10px;
       }
-    })();
-  {% endif %}
-</script>
-{% endblock %}
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        margin: 0;
+        font-family: 'Inter', sans-serif;
+        color: var(--ink);
+        background: var(--paper);
+        -webkit-font-smoothing: antialiased;
+      }
+      h1,
+      h2,
+      h3,
+      h4,
+      .font-display {
+        font-family: 'Lora', serif;
+        color: var(--navy);
+        margin: 0;
+      }
+      .script {
+        font-family: 'Caveat', cursive;
+        color: var(--navy);
+        font-size: 1.4rem;
+      }
+      p {
+        color: var(--slate);
+        line-height: 1.65;
+      }
+      a {
+        color: inherit;
+      }
+      img {
+        max-width: 100%;
+        display: block;
+      }
+      .wrap {
+        max-width: 1140px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        border-radius: 6px;
+        padding: 0.75rem 1.4rem;
+        font-weight: 600;
+        font-size: 0.95rem;
+        text-decoration: none;
+        border: 1.5px solid transparent;
+        cursor: pointer;
+        transition: transform 0.12s ease, box-shadow 0.12s ease;
+      }
+      .btn:hover {
+        transform: translateY(-1px);
+      }
+      .btn-gold {
+        background: var(--gold);
+        color: var(--navy-deep);
+      }
+      .btn-gold:hover {
+        background: var(--gold-dark);
+      }
+      .btn-outline-navy {
+        border-color: var(--navy);
+        color: var(--navy);
+        background: transparent;
+      }
+      .btn-outline-navy:hover {
+        background: var(--navy);
+        color: #fff;
+      }
+      .btn-outline-white {
+        border-color: rgba(255, 255, 255, 0.55);
+        color: #fff;
+        background: transparent;
+      }
+      .btn-outline-white:hover {
+        background: rgba(255, 255, 255, 0.12);
+      }
+      .btn[disabled] {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+      }
+      .eyebrow-rule {
+        width: 38px;
+        height: 3px;
+        background: var(--gold);
+        border-radius: 2px;
+        margin-bottom: 0.9rem;
+      }
+      
+      /* Header */
+      header.site-header {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        background: var(--navy);
+        padding: 0.9rem 0;
+      }
+      header.site-header .wrap {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        color: #fff;
+        text-decoration: none;
+        font-family: 'Lora', serif;
+        font-weight: 700;
+        font-size: 1.15rem;
+        line-height: 1.15;
+      }
+      .brand svg {
+        flex-shrink: 0;
+      }
+      .brand .with {
+        font-family: 'Caveat', cursive;
+        font-weight: 600;
+        color: var(--gold);
+        font-size: 1.05rem;
+        display: block;
+      }
+      nav.main-nav {
+        display: flex;
+        align-items: center;
+        gap: 1.8rem;
+      }
+      nav.main-nav a {
+        color: #e7edf2;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.92rem;
+      }
+      nav.main-nav a:hover {
+        color: var(--gold);
+      }
+      .nav-toggle {
+        display: none;
+        background: none;
+        border: none;
+        color: #fff;
+        font-size: 1.4rem;
+      }
+      
+      /* Hero */
+      .hero {
+        background: linear-gradient(180deg, #fbfcfd, #f1f5f7);
+        padding: 4rem 0 3rem;
+        overflow: hidden;
+      }
+      .hero-grid {
+        display: grid;
+        grid-template-columns: 1.15fr 1fr;
+        gap: 2.5rem;
+        align-items: center;
+      }
+      .hero h1 {
+        font-size: 2.5rem;
+        line-height: 1.18;
+        margin-bottom: 0.9rem;
+      }
+      .hero .tagline {
+        color: var(--gold-dark);
+        font-weight: 700;
+        font-size: 1.1rem;
+        margin-bottom: 0.9rem;
+      }
+      .hero p.lead {
+        max-width: 46ch;
+        font-size: 1.05rem;
+      }
+      .hero-btns {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.8rem;
+        margin-top: 1.6rem;
+      }
+      .hero-media {
+        position: relative;
+        display: flex;
+        justify-content: center;
+      }
+      .hero-photo-frame {
+        position: relative;
+        width: 280px;
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 18px 40px rgba(15, 42, 76, 0.18);
+      }
+      .hero-photo-frame img {
+        width: 100%;
+        height: 360px;
+        object-fit: cover;
+        object-position: top center;
+      }
+      .hero-callout {
+        position: absolute;
+        top: -18px;
+        right: -40px;
+        background: var(--navy);
+        color: #fff;
+        padding: 1.1rem 1.3rem;
+        border-radius: 8px;
+        max-width: 180px;
+        font-family: 'Lora', serif;
+        font-weight: 600;
+        font-size: 1.05rem;
+        line-height: 1.35;
+      }
+      .hero-callout span {
+        display: block;
+        width: 26px;
+        height: 2px;
+        background: var(--gold);
+        margin-top: 0.5rem;
+      }
+      .hero-script-1 {
+        position: absolute;
+        left: -2.2rem;
+        top: 1.2rem;
+        transform: rotate(-4deg);
+      }
+      .hero-script-2 {
+        position: absolute;
+        right: -1rem;
+        bottom: -1.6rem;
+        text-align: right;
+        transform: rotate(2deg);
+      }
+      @media (max-width: 991px) {
+        .hero-script-1,
+        .hero-script-2 {
+          display: none;
+        }
+        .hero-callout {
+          right: 0;
+          top: -14px;
+        }
+      }
+      
+      section {
+        padding: 4rem 0;
+      }
+      .section-head {
+        max-width: 60ch;
+        margin-bottom: 2.2rem;
+      }
+      .section-head h2 {
+        font-size: 1.9rem;
+      }
+      
+      /* Meet Ollie */
+      #about {
+        background: var(--paper);
+      }
+      .about-grid {
+        display: grid;
+        grid-template-columns: 1fr 0.8fr;
+        gap: 3rem;
+        align-items: center;
+      }
+      .about-grid p {
+        max-width: 56ch;
+      }
+      .quote-box {
+        border-left: 3px solid var(--gold);
+        padding-left: 1.1rem;
+        margin: 1.4rem 0;
+      }
+      .quote-box p.script {
+        font-size: 1.5rem;
+        margin: 0;
+      }
+      .quote-box .who {
+        color: var(--slate);
+        font-size: 0.9rem;
+      }
+      .about-side {
+        background: var(--navy);
+        border-radius: 14px;
+        padding: 2rem;
+        color: #fff;
+      }
+      .about-side ul {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 1.2rem;
+      }
+      .about-side li {
+        background: rgba(255, 255, 255, 0.08);
+        padding: 0.7rem 1rem;
+        border-radius: 6px;
+        margin-bottom: 0.6rem;
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+      .about-side .tag {
+        font-family: 'Caveat', cursive;
+        font-size: 1.2rem;
+        color: var(--gold);
+        text-align: right;
+      }
+      
+      /* Who we help */
+      #who-we-help {
+        background: var(--soft);
+      }
+      .help-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 1.2rem;
+      }
+      @media (max-width: 991px) {
+        .help-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      @media (max-width: 560px) {
+        .help-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .help-card {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 1.6rem 1.3rem;
+        text-align: center;
+      }
+      .icon-circle {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        border: 2px solid var(--gold);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        color: var(--navy);
+      }
+      .help-card h4 {
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+      }
+      .help-card p {
+        font-size: 0.88rem;
+        margin: 0;
+      }
+      
+      /* Programs */
+      .programs-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.4rem;
+      }
+      @media (max-width: 991px) {
+        .programs-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      @media (max-width: 560px) {
+        .programs-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .program-card {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 1.6rem;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+      }
+      .program-card h4 {
+        font-size: 1.05rem;
+        margin-bottom: 0.9rem;
+      }
+      .program-card ul {
+        list-style: none;
+        margin: 0 0 1.2rem;
+        padding: 0;
+        flex-grow: 1;
+      }
+      .program-card li {
+        font-size: 0.88rem;
+        color: var(--ink);
+        margin-bottom: 0.55rem;
+        padding-left: 1.4rem;
+        position: relative;
+      }
+      .program-card li::before {
+        content: '✓';
+        color: var(--gold-dark);
+        font-weight: 700;
+        position: absolute;
+        left: 0;
+      }
+      .program-card .btn {
+        align-self: flex-start;
+      }
+      .programs-note {
+        font-size: 0.85rem;
+        color: var(--slate);
+        max-width: 70ch;
+        margin-top: 2rem;
+      }
+      
+      /* MCQ banner */
+      #mcq {
+        background: var(--navy);
+        color: #fff;
+        border-radius: 18px;
+        margin: 0 1.5rem;
+        padding: 3rem 2.5rem;
+      }
+      #mcq .wrap {
+        padding: 0;
+        max-width: 1090px;
+      }
+      .mcq-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 1.6rem;
+        margin-bottom: 2rem;
+      }
+      .mcq-top h2 {
+        color: #fff;
+      }
+      .mcq-top p {
+        color: #c9d6df;
+        max-width: 44ch;
+        margin: 0.6rem 0 0;
+      }
+      .mcq-icons {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.2rem;
+      }
+      @media (max-width: 767px) {
+        .mcq-icons {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      .mcq-icon {
+        text-align: center;
+        font-size: 0.85rem;
+        color: #dce6ec;
+      }
+      .mcq-icon .icon-circle {
+        border-color: var(--gold);
+        color: #fff;
+        margin-bottom: 0.7rem;
+      }
+      .coming-soon {
+        font-size: 0.72rem;
+        text-transform: none;
+        background: rgba(255, 255, 255, 0.15);
+        padding: 0.15rem 0.5rem;
+        border-radius: 4px;
+        margin-left: 0.4rem;
+      }
+      
+      /* Resources */
+      .resources-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.4rem;
+      }
+      @media (max-width: 767px) {
+        .resources-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .resource-card {
+        display: flex;
+        gap: 1rem;
+        align-items: flex-start;
+      }
+      .resource-card .icon-circle {
+        flex-shrink: 0;
+        margin: 0;
+      }
+      .resource-card h4 {
+        font-size: 1rem;
+        margin-bottom: 0.4rem;
+      }
+      .resource-card p {
+        font-size: 0.9rem;
+        margin: 0;
+      }
+      
+      /* Contact */
+      #contact {
+        background: var(--soft);
+      }
+      .contact-grid {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: 2.5rem;
+        align-items: start;
+      }
+      @media (max-width: 991px) {
+        .contact-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .contact-form {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 2rem;
+      }
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+      }
+      @media (max-width: 560px) {
+        .form-row {
+          grid-template-columns: 1fr;
+        }
+      }
+      .field {
+        margin-bottom: 1.1rem;
+      }
+      .field label {
+        display: block;
+        font-weight: 600;
+        font-size: 0.85rem;
+        margin-bottom: 0.4rem;
+        color: var(--ink);
+      }
+      .field input,
+      .field select,
+      .field textarea {
+        width: 100%;
+        border: 1.5px solid var(--line);
+        border-radius: 8px;
+        padding: 0.65rem 0.8rem;
+        font-family: inherit;
+        font-size: 0.92rem;
+        color: var(--ink);
+        background: #fff;
+      }
+      .field input:focus,
+      .field select:focus,
+      .field textarea:focus {
+        outline: 2px solid var(--gold);
+        border-color: var(--gold);
+      }
+      .contact-side {
+        background: var(--navy);
+        color: #fff;
+        border-radius: 14px;
+        padding: 2rem;
+        height: 100%;
+      }
+      .contact-side p {
+        color: #c9d6df;
+      }
+      .contact-side .row {
+        display: flex;
+        gap: 0.8rem;
+        align-items: flex-start;
+        margin-bottom: 1.1rem;
+        font-size: 0.92rem;
+      }
+      #formStatus {
+        margin-top: 1rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+      }
+      #formStatus.success {
+        color: #1c6b4a;
+      }
+      
+      /* Footer */
+      footer.site-footer {
+        background: var(--navy-deep);
+        color: #b9c7d2;
+        padding: 2.8rem 0 1.4rem;
+        font-size: 0.85rem;
+      }
+      footer .foot-top {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        margin-bottom: 1.6rem;
+      }
+      footer .brand {
+        color: #fff;
+      }
+      footer .foot-links {
+        display: flex;
+        gap: 1.4rem;
+        flex-wrap: wrap;
+      }
+      footer .foot-links a {
+        text-decoration: none;
+        color: #b9c7d2;
+        font-weight: 600;
+      }
+      footer .foot-links a:hover {
+        color: var(--gold);
+      }
+      footer .disclaimer {
+        max-width: 900px;
+        border-top: 1px solid rgba(255, 255, 255, 0.12);
+        padding-top: 1.4rem;
+        margin-top: 1rem;
+        line-height: 1.6;
+        font-size: 0.8rem;
+      }
+      footer .foot-bottom {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 1.4rem;
+        font-size: 0.78rem;
+        color: #7e93a1;
+      }
+      footer .socials {
+        display: flex;
+        gap: 0.8rem;
+      }
+      footer .socials a {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      @media (max-width: 820px) {
+        nav.main-nav {
+          position: fixed;
+          top: 64px;
+          left: 0;
+          right: 0;
+          background: var(--navy);
+          flex-direction: column;
+          align-items: flex-start;
+          padding: 1rem 1.5rem;
+          gap: 1rem;
+          display: none;
+        }
+        nav.main-nav.open {
+          display: flex;
+        }
+        .nav-toggle {
+          display: block;
+        }
+        .hero-grid,
+        .about-grid {
+          grid-template-columns: 1fr;
+        }
+        .about-side {
+          order: -1;
+        }
+      }
+      /* Modal Styles */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(15, 42, 76, 0.7); /* Matches var(--navy) */
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+      }
+      .modal-overlay.active {
+        display: flex;
+        opacity: 1;
+      }
+      .modal-content {
+        background: var(--paper);
+        padding: 2.5rem;
+        border-radius: 14px;
+        width: 90%;
+        max-width: 420px;
+        position: relative;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+        transform: translateY(-20px);
+        transition: transform 0.2s ease;
+      }
+      .modal-overlay.active .modal-content {
+        transform: translateY(0);
+      }
+      .modal-content h2 {
+        margin-bottom: 1.5rem;
+        text-align: center;
+      }
+      .modal-close {
+        position: absolute;
+        top: 15px;
+        right: 20px;
+        background: transparent;
+        border: none;
+        font-size: 1.8rem;
+        cursor: pointer;
+        color: var(--slate);
+        transition: color 0.15s ease;
+      }
+      .modal-close:hover {
+        color: var(--navy);
+      }
+      /* Modal Base Styles */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(15, 42, 76, 0.7); /* Matches your var(--navy) color */
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+      }
+      
+      /* When the modal is open */
+      .modal-overlay.active {
+        display: flex;
+        opacity: 1;
+      }
+      
+      .modal-content {
+        background: var(--paper);
+        padding: 2.5rem;
+        border-radius: 14px;
+        width: 90%;
+        max-width: 420px; /* Default width for forms */
+        position: relative;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+        transform: translateY(-20px);
+        transition: transform 0.2s ease;
+      }
+      
+      .modal-overlay.active .modal-content {
+        transform: translateY(0);
+      }
+      
+      .modal-content h2 {
+        margin-bottom: 1.5rem;
+        text-align: center;
+      }
+      
+      /* The 'X' close button */
+      .modal-close {
+        position: absolute;
+        top: 15px;
+        right: 20px;
+        background: transparent;
+        border: none;
+        font-size: 1.8rem;
+        cursor: pointer;
+        color: var(--slate);
+        transition: color 0.15s ease;
+      }
+      
+      .modal-close:hover {
+        color: var(--navy);
+      }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="wrap">
+        <a href="{% url 'index' %}" class="brand">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6">
+            <path d="M12 3c-2 0-3.2 1.1-4 1.1S6.4 3 5 3C3.3 3 2 4.7 2 7c0 3 1.3 4.7 1.7 7.4.3 2.1.7 6.6 2.3 6.6 1.4 0 1.4-3 2.4-3s1 3 2.4 3c1.7 0 1.9-4.6 2.3-6.7C13.5 11.6 15 10 15 7c0-2.3-1.3-4-3-4Z" />
+          </svg>
+          <span>License Ready<span class="with">with Ollie</span></span>
+        </a>
+        <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">☰</button>
+        <nav class="main-nav" id="mainNav">
+          <a href="#about">About</a>
+          <a href="#programs">Programs</a>
+          <a href="#resources">Resources</a>
+          <a href="#contact">Contact</a>
+          <a href="#" onclick="openModal('loginModal'); return false;">Log In</a>
+          <a href="#" class="btn btn-gold" onclick="openModal('enrollModal'); return false;">Enrol Now</a>
+        </nav>
+      </div>
+    </header>
+
+    <section class="hero" id="home">
+      <div class="wrap hero-grid">
+        <div>
+          <div class="tagline">Clarity. Strategy. Support.</div>
+          <h1>Helping Internationally Trained Dental Professionals Navigate the Canadian Licensing Journey.</h1>
+          <p class="lead">Practical guidance, structured exam preparation, and focused support to help you move forward with greater confidence.</p>
+          <div class="hero-btns">
+            <a href="#programs" class="btn btn-gold">Explore Programs</a>
+            <a href="#" onclick="openModal('loginModal'); return false;" class="btn btn-outline-navy">Practice MCQs</a>
+            <a href="https://www.youtube.com/@licenseReadyWithOllie" target="_blank" rel="noopener" class="btn btn-outline-navy">Watch on YouTube</a>
+          </div>
+        </div>
+        <div class="hero-media">
+          <div class="hero-photo-frame">
+            <img src="{% static 'main/img/hero.jpg' %}" alt="Oluchi &quot;Ollie&quot; Omogbai, founder of License Ready with Ollie, speaking at a podium" />
+            <div class="hero-callout">
+              Same Knowledge.<br />New Opportunities.<span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="about">
+      <div class="wrap about-grid">
+        <div>
+          <div class="eyebrow-rule"></div>
+          <h2>Meet Ollie</h2>
+          <p>I'm Oluchi "Ollie" Omogbai — a foreign-trained dentist, dental educator, and founder of License Ready with Ollie. I support internationally trained dental professionals as they navigate the Canadian licensing journey through education, examination preparation, mentorship, and practical guidance.</p>
+
+          <div class="quote-box">
+            <p class="script">"Your background is a strength, not a setback."</p>
+            <div class="who">— Ollie</div>
+          </div>
+          <!-- Updated button to trigger the modal instead of scrolling to who-we-help -->
+          <a href="#" onclick="openModal('storyModal'); return false;" class="btn btn-gold">Read My Story</a>
+        </div>
+        <div class="about-side">
+          <ul>
+            <li>Knowledge</li>
+            <li>Preparation</li>
+            <li>Confidence</li>
+            <li>New Beginnings</li>
+          </ul>
+          <div class="tag">
+            Same Passion.<br />More Possibilities.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="who-we-help">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="eyebrow-rule"></div>
+          <h2>Who We Help</h2>
+        </div>
+        <div class="help-grid">
+          <div class="help-card">
+            <div class="icon-circle">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                <circle cx="12" cy="12" r="9" />
+                <path d="M3 12h18M12 3c2.5 2.7 2.5 14.3 0 18M12 3c-2.5 2.7-2.5 14.3 0 18" />
+              </svg>
+            </div>
+            <h4>Internationally Trained Dentists</h4>
+            <p>Dentists educated outside Canada who are navigating Canadian licensing and career transition.</p>
+          </div>
+          <div class="help-card">
+            <div class="icon-circle">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                <path d="M7 3h7l4 4v14H7z" />
+                <path d="M14 3v4h4M9 12h6M9 16h6" />
+              </svg>
+            </div>
+            <h4>NDAEB Candidates</h4>
+            <p>Candidates preparing for the NDAEB written examination, CPE, remediation, or additional-attempt requirements.</p>
+          </div>
+          <div class="help-card">
+            <div class="icon-circle">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                <path d="M12 3 2 8l10 5 10-5-10-5Z" />
+                <path d="M6 10.5V16c0 1.4 2.7 3 6 3s6-1.6 6-3v-5.5" />
+              </svg>
+            </div>
+            <h4>NDEB Candidates</h4>
+            <p>Preparing for the AFK, ACJ, NDECC Situational Judgement, and NDECC Skills through the equivalency process.</p>
+          </div>
+          <div class="help-card">
+            <div class="icon-circle">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                <path d="M12 3c-2 0-3.2 1.1-4 1.1S6.4 3 5 3C3.3 3 2 4.7 2 7c0 3 1.3 4.7 1.7 7.4.3 2.1.7 6.6 2.3 6.6 1.4 0 1.4-3 2.4-3s1 3 2.4 3c1.7 0 1.9-4.6 2.3-6.7C13.5 11.6 15 10 15 7c0-2.3-1.3-4-3-4Z" />
+              </svg>
+            </div>
+            <h4>Denturism Candidates</h4>
+            <p>Individuals pursuing licensure in denturism in Canada, preparing for written and OSCE components.</p>
+          </div>
+          <div class="help-card">
+            <div class="icon-circle">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                <circle cx="9" cy="8" r="3" />
+                <path d="M2 20c0-3.3 3.1-6 7-6s7 2.7 7 6" />
+                <circle cx="18" cy="9" r="2.3" />
+                <path d="M15.5 20c.3-2.4 2.3-4.2 4.8-4.2 1 0 1.9.3 2.7.8" />
+              </svg>
+            </div>
+            <h4>Dental Professionals</h4>
+            <p>Hygienists, assistants, and other professionals transitioning into the Canadian dental system.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="programs">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="eyebrow-rule"></div>
+          <h2>Programs &amp; Support</h2>
+          <p>Choose the level of support that best matches where you are in your licensing journey. Programs may include structured teaching, examination-focused practice, remediation support, or one-on-one guidance.</p>
+        </div>
+        <div class="programs-grid">
+          <div class="program-card">
+            <h4>NDAEB Preparation</h4>
+            <ul>
+              <li>Written Examination Preparation</li>
+              <li>Clinical Practice Evaluation (CPE) Preparation</li>
+              <li>Remediation Support</li>
+              <li>Fourth-Attempt / Additional-Attempt Support</li>
+            </ul>
+            <a href="#contact" class="btn btn-gold pathway-btn" data-pathway="NDAEB Written">Learn More</a>
+          </div>
+          <div class="program-card">
+            <h4>NDEB Equivalency Preparation</h4>
+            <ul>
+              <li>Assessment of Fundamental Knowledge (AFK)</li>
+              <li>Assessment of Clinical Judgement (ACJ)</li>
+              <li>NDECC Situational Judgement</li>
+              <li>NDECC Skills</li>
+            </ul>
+            <a href="#contact" class="btn btn-gold pathway-btn" data-pathway="AFK">Learn More</a>
+          </div>
+          <div class="program-card">
+            <h4>Denturism Preparation</h4>
+            <ul>
+              <li>Written Examination Preparation</li>
+              <li>OSCE Preparation</li>
+            </ul>
+            <a href="#contact" class="btn btn-gold pathway-btn" data-pathway="Denturism Written">Learn More</a>
+          </div>
+          <div class="program-card">
+            <h4>Mentorship &amp; Guidance</h4>
+            <ul>
+              <li>1-on-1 mentorship (standalone option available)</li>
+              <li>Pathway clarity</li>
+              <li>Personalized study strategy</li>
+              <li>Career transition support</li>
+            </ul>
+            <a href="#contact" class="btn btn-gold pathway-btn" data-pathway="Mentorship & Guidance">Learn More</a>
+          </div>
+        </div>
+        <p class="programs-note">Current fees are provided directly to interested candidates and are not displayed publicly.</p>
+      </div>
+    </section>
+
+    <section>
+      <div id="mcq">
+        <div class="wrap">
+          <div class="mcq-top">
+            <div>
+              <div class="eyebrow-rule"></div>
+              <h2>MCQ Practice</h2>
+              <p>Build confidence through focused practice. Use structured question sets to identify weak areas, strengthen clinical reasoning, and become more comfortable with examination-style decision making.</p>
+            </div>
+            <a href="#" class="btn btn-outline-white" onclick="openModal('loginModal'); return false;">Practice MCQs</a>
+          </div>
+          <div class="mcq-icons">
+            <div class="mcq-icon">
+              <div class="icon-circle">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                  <path d="M4 19V5a2 2 0 0 1 2-2h9l5 5v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z" />
+                  <path d="M14 3v5h5M8 12h8M8 16h5" />
+                </svg>
+              </div>Topic-based practice
+            </div>
+            <div class="mcq-icon">
+              <div class="icon-circle">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                  <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" />
+                </svg>
+              </div>Mixed question sets
+            </div>
+            <div class="mcq-icon">
+              <div class="icon-circle">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                  <rect x="3" y="4" width="18" height="12" rx="1.5" />
+                  <path d="M8 20h8M12 16v4" />
+                </svg>
+              </div>Mock exam practice
+            </div>
+            <div class="mcq-icon">
+              <div class="icon-circle">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                  <circle cx="11" cy="11" r="7" />
+                  <path d="m21 21-4.3-4.3" />
+                </svg>
+              </div>Identify weak areas
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="resources">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="eyebrow-rule"></div>
+          <h2>Resources</h2>
+          <p>Free resources to help internationally trained dental professionals better understand Canadian licensing, examination preparation, and career transition.</p>
+        </div>
+        <div class="resources-grid">
+          <div class="resource-card">
+            <div class="icon-circle">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                <rect x="2" y="5" width="20" height="14" rx="2.5" />
+                <path d="m10 9 5 3-5 3Z" fill="currentColor" stroke="none" />
+              </svg>
+            </div>
+            <div>
+              <h4>YouTube Videos</h4>
+              <p>Watch clear, practical explanations on licensing updates, exam guidance, and real-life journey content.</p>
+            </div>
+          </div>
+          <div class="resource-card">
+            <div class="icon-circle">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                <path d="M7 3h7l4 4v14H7z" />
+                <path d="M14 3v4h4M9 13h6M9 17h6" />
+              </svg>
+            </div>
+            <div>
+              <h4>Licensing Guides</h4>
+              <p>Step-by-step guides to help you understand the Canadian dental licensing process.</p>
+            </div>
+          </div>
+          <div class="resource-card">
+            <div class="icon-circle">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                <path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.4.3.5.7.5 1.1v.5h6v-.5c0-.4.1-.8.5-1.1A6 6 0 0 0 12 3Z" />
+              </svg>
+            </div>
+            <div>
+              <h4>Study Tips</h4>
+              <p>Practical preparation and exam-strategy content to help you study smarter and stay motivated.</p>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:2rem;">
+          <a href="https://www.youtube.com/@licenseReadyWithOllie" target="_blank" rel="noopener" class="btn btn-outline-navy">Watch on YouTube</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="eyebrow-rule"></div>
+          <h2>Get in Touch</h2>
+          <p>Have questions or ready to enrol? Tell us where you are in your journey and what kind of support you're looking for.</p>
+        </div>
+        <div class="contact-grid">
+          <form class="contact-form" id="enquiryForm">
+            <div class="form-row">
+              <div class="field">
+                <label for="fullName">Full Name *</label>
+                <input type="text" id="fullName" name="fullName" required />
+              </div>
+              <div class="field">
+                <label for="email">Email Address *</label>
+                <input type="email" id="email" name="email" required />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="field">
+                <label for="country">Country / Province</label>
+                <input type="text" id="country" name="country" />
+              </div>
+              <div class="field">
+                <label for="background">Professional Background</label>
+                <select id="background" name="background">
+                  <option value="">Select an option</option>
+                  <option>Internationally Trained Dentist</option>
+                  <option>Dental Assistant</option>
+                  <option>Denturism Candidate</option>
+                  <option>Other Dental Professional</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="field">
+                <label for="pathway">Exam / Pathway *</label>
+                <select id="pathway" name="pathway" required>
+                  <option value="">Select an option</option>
+                  <option>NDAEB Written</option>
+                  <option>NDAEB CPE</option>
+                  <option>NDAEB Remediation / Fourth Attempt</option>
+                  <option>AFK</option>
+                  <option>ACJ</option>
+                  <option>NDECC Situational Judgement</option>
+                  <option>NDECC Skills</option>
+                  <option>Denturism Written</option>
+                  <option>Denturism OSCE</option>
+                  <option>Mentorship & Guidance</option>
+                  <option>General Licensing Guidance</option>
+                  <option>Other</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="examDate">Planned Exam Date</label>
+                <input type="text" id="examDate" name="examDate" placeholder="e.g. March 2027" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="field">
+                <label for="attempts">Previous Attempts</label>
+                <input type="text" id="attempts" name="attempts" placeholder="Not applicable" />
+              </div>
+              <div class="field">
+                <label for="supportNeeded">Support Needed</label>
+                <select id="supportNeeded" name="supportNeeded">
+                  <option value="">Select an option</option>
+                  <option>Comprehensive teaching</option>
+                  <option>MCQ review</option>
+                  <option>Mock examination</option>
+                  <option>One-on-one mentorship</option>
+                  <option>Remediation</option>
+                  <option>Not sure yet</option>
+                </select>
+              </div>
+            </div>
+            <div class="field">
+              <label for="message">Message *</label>
+              <textarea id="message" name="message" rows="4" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-gold" style="width:100%; justify-content:center;">Send Message</button>
+            <div id="formStatus" role="status"></div>
+          </form>
+
+          <div class="contact-side">
+            <h3 style="color:#fff; margin-bottom:1rem;">Contact details</h3>
+            <div class="row">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.8" style="margin-top:2px;">
+                <path d="M3 6h18v12H3z" />
+                <path d="m3 7 9 6 9-6" />
+              </svg>
+              <span>licensereadywithollie@gmail.com</span>
+            </div>
+            <div class="row">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.8" style="margin-top:2px;">
+                <path d="M12 21s7-6.3 7-11.5A7 7 0 0 0 5 9.5C5 14.7 12 21 12 21Z" />
+                <circle cx="12" cy="9.5" r="2.3" />
+              </svg>
+              <span>Supporting dental professionals worldwide.</span>
+            </div>
+            <p style="margin-top:1.5rem; font-size:.85rem;">We will respond as soon as possible.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <div class="wrap">
+        <div class="foot-top">
+          <div>
+            <div class="brand" style="font-family:'Lora',serif; font-weight:700; font-size:1.05rem;">License Ready with Ollie</div>
+          </div>
+          <div class="foot-links">
+            <a href="#about">About</a>
+            <a href="#programs">Programs</a>
+            <a href="#resources">Resources</a>
+            <a href="#contact">Contact</a>
+          </div>
+          <div class="socials">
+            <a href="https://www.youtube.com/@licenseReadyWithOllie" target="_blank" rel="noopener" aria-label="YouTube">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="#fff">
+                <path d="m10 9 5 3-5 3Z" />
+                <rect x="2" y="5" width="20" height="14" rx="2.5" fill="none" stroke="#fff" stroke-width="1.6" />
+              </svg>
+            </a>
+            <a href="#" aria-label="Instagram">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6">
+                <rect x="3" y="3" width="18" height="18" rx="5" />
+                <circle cx="12" cy="12" r="4" />
+                <circle cx="17.2" cy="6.8" r="1" />
+              </svg>
+            </a>
+            <a href="#" aria-label="LinkedIn">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="#fff">
+                <rect x="2" y="9" width="4" height="12" />
+                <circle cx="4" cy="4" r="2.2" />
+                <path d="M10 9h4v2c.7-1.2 2.1-2.3 4.2-2.3 3.4 0 4.8 2.2 4.8 5.6V21h-4v-5.7c0-1.5-.5-2.6-1.9-2.6-1.1 0-1.7.7-2 1.4-.1.3-.1.6-.1 1V21h-4Z" />
+              </svg>
+            </a>
+          </div>
+        </div>
+        <p class="disclaimer">License Ready with Ollie is an independent education, coaching, and examination-preparation service. It is not a regulatory authority and is not affiliated with, accredited by, or endorsed by Canadian dental licensing, examination, or regulatory organizations unless expressly stated. Information provided is educational in nature. Candidates remain responsible for confirming current examination, registration, and licensing requirements directly with the appropriate official body. Exam preparation cannot guarantee a passing result.</p>
+        <div class="foot-bottom">
+          <span>&copy; <span id="year"></span> License Ready with Ollie. All rights reserved.</span>
+        </div>
+      </div>
+    </footer>
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal-overlay">
+      <div class="modal-content">
+        <button class="modal-close" onclick="closeModal('loginModal')" aria-label="Close">&times;</button>
+        <h2>Log In</h2>
+        <form action="{% url 'login' %}" method="POST">
+          {% csrf_token %}
+          <div class="field">
+            <label for="loginUsername">Username</label>
+            <input type="text" id="loginUsername" name="username" required />
+          </div>
+          <div class="field">
+            <label for="loginPassword">Password</label>
+            <input type="password" id="loginPassword" name="password" required />
+          </div>
+          <button type="submit" class="btn btn-gold" style="width:100%; justify-content:center; margin-top: 1rem;">Log In</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Enroll Modal -->
+    <div id="enrollModal" class="modal-overlay">
+      <div class="modal-content">
+        <button class="modal-close" onclick="closeModal('enrollModal')" aria-label="Close">&times;</button>
+        <h2>Enrol Now</h2>
+        <form action="{% url 'enroll' %}" method="POST">
+          {% csrf_token %}
+          <div class="field">
+            <label for="enrollUsername">Username</label>
+            <input type="text" id="enrollUsername" name="username" required />
+          </div>
+          <div class="field">
+            <label for="enrollEmail">Email</label>
+            <input type="email" id="enrollEmail" name="email" required />
+          </div>
+          <div class="field">
+            <label for="enrollPassword">Password</label>
+            <input type="password" id="enrollPassword" name="password" required />
+          </div>
+          <button type="submit" class="btn btn-gold" style="width:100%; justify-content:center; margin-top: 1rem;">Enrol</button>
+        </form>
+      </div>
+    </div>
+    <!-- Story Modal -->
+    <div id="storyModal" class="modal-overlay">
+      <div class="modal-content" style="max-width: 600px;">
+        <button class="modal-close" onclick="closeModal('storyModal')" aria-label="Close">&times;</button>
+        <h2>Meet Ollie</h2>
+        <p>I'm Oluchi "Ollie" Omogbai — a foreign-trained dentist, dental educator, and founder of License Ready with Ollie. I support internationally trained dental professionals as they navigate the Canadian licensing journey through education, examination preparation, mentorship, and practical guidance.</p>
+        <p>With more than 10 years of clinical and teaching experience in a university teaching hospital, I have taught and mentored junior dentists and final-year dental students. After moving to Canada, I continued my professional journey within the Canadian dental system while progressing through the licensing pathway myself.</p>
+        <p>My goal is simple: to make the journey clearer, more strategic, and less isolating — so you can understand your options, prepare with purpose, and keep moving forward.</p>
+      </div>
+    </div>
+    <script>
+      document.getElementById('year').textContent = new Date().getFullYear()
+      
+      var navToggle = document.getElementById('navToggle')
+      var mainNav = document.getElementById('mainNav')
+      navToggle.addEventListener('click', function () {
+        mainNav.classList.toggle('open')
+      })
+      mainNav.querySelectorAll('a').forEach(function (a) {
+        a.addEventListener('click', function () {
+          mainNav.classList.remove('open')
+        })
+      })
+      
+      document.querySelectorAll('.pathway-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var select = document.getElementById('pathway')
+          var value = btn.getAttribute('data-pathway')
+          for (var i = 0; i < select.options.length; i++) {
+            if (select.options[i].text === value) {
+              select.selectedIndex = i
+              break
+            }
+          }
+        })
+      })
+      
+      document.getElementById('enquiryForm').addEventListener('submit', function (e) {
+        e.preventDefault()
+        var status = document.getElementById('formStatus')
+        status.textContent = 'Thank you for contacting License Ready with Ollie. Your enquiry has been received. We will respond as soon as possible.'
+        status.className = 'success'
+        e.target.reset()
+      })
+      // Modal Functions
+      function openModal(modalId) {
+        document.getElementById(modalId).classList.add('active')
+        document.body.style.overflow = 'hidden' // Prevents background scrolling
+      }
+      
+      function closeModal(modalId) {
+        document.getElementById(modalId).classList.remove('active')
+        document.body.style.overflow = '' // Restores scrolling
+      }
+      
+      // Close modal if user clicks outside the modal box
+      window.addEventListener('click', function (event) {
+        if (event.target.classList.contains('modal-overlay')) {
+          event.target.classList.remove('active')
+          document.body.style.overflow = ''
+        }
+      })
+      // Function to open a specific modal by its ID
+      function openModal(modalId) {
+        document.getElementById(modalId).classList.add('active')
+        document.body.style.overflow = 'hidden' // Prevents the background page from scrolling
+      }
+      
+      // Function to close a specific modal by its ID
+      function closeModal(modalId) {
+        document.getElementById(modalId).classList.remove('active')
+        document.body.style.overflow = '' // Restores background scrolling
+      }
+      
+      // Close the modal if the user clicks the dark overlay area outside the white box
+      window.addEventListener('click', function (event) {
+        if (event.target.classList.contains('modal-overlay')) {
+          event.target.classList.remove('active')
+          document.body.style.overflow = ''
+        }
+      })
+    </script>
+  </body>
+</html>
