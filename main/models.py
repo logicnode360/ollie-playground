@@ -1,7 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 
 class Question(models.Model):
     question = models.TextField()
@@ -13,7 +11,7 @@ class Question(models.Model):
     explanation = models.TextField(blank=True, help_text="Key note explanation shown during review.")
 
     def __str__(self):
-        return f"Q{self.id}: {self.question_text[:50]}"
+        return f"Q{self.id}: {self.question[:50]}"
 
 class Profile(models.Model):
     PAYMENT_STATUS_CHOICES = [
@@ -33,4 +31,8 @@ class ExamAttempt(models.Model):
     score = models.IntegerField()
     total_questions = models.IntegerField()
     percentage = models.FloatField()
+    user_answers = models.JSONField(default=dict, blank=True)  # Stores {"question_id": "selected_option"}
     date_taken = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.score}/{self.total_questions} ({self.date_taken.strftime('%Y-%m-%d')})"

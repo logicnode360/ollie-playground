@@ -4,145 +4,265 @@
 
 {% block extra_head %}
 <style>
-  .exam-shell{max-width:720px; margin:0 auto;}
-  .exam-progress-track{height:6px; background:var(--line); border-radius:4px; overflow:hidden; margin-bottom:2rem;}
-  .exam-progress-fill{height:100%; background:var(--teal); width:0%; transition:width .25s ease;}
-  .exam-meta{display:flex; justify-content:space-between; align-items:center; color:var(--slate); font-size:.9rem; margin-bottom:.6rem;}
-  .q-card{display:none;}
-  .q-card.active{display:block;}
-  .q-option{
-    border:1.5px solid var(--line); border-radius:10px; padding:.9rem 1.1rem;
-    display:flex; align-items:center; gap:.8rem; cursor:pointer; margin-bottom:.7rem;
-    transition:border-color .15s ease, background .15s ease;
+  /* Watermark Styling */
+  .watermark {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-30deg);
+    font-size: 7rem;
+    font-weight: 800;
+    color: rgba(0, 0, 0, 0.04);
+    z-index: 9999;
+    pointer-events: none;
+    white-space: nowrap;
+    user-select: none;
   }
-  .q-option:hover{border-color:var(--teal);}
-  .q-option input{accent-color:var(--teal);}
-  .q-option.selected{border-color:var(--teal); background:var(--teal-light);}
-  .exam-nav-btns{display:flex; justify-content:space-between; margin-top:1.6rem;}
-  .q-dots{display:flex; flex-wrap:wrap; gap:.4rem; margin-bottom:1.8rem;}
-  .q-dot{width:10px; height:10px; border-radius:50%; background:var(--line); border:none;}
-  .q-dot.answered{background:var(--teal);}
-  .q-dot.current{outline:2px solid var(--coral); outline-offset:2px;}
+
+  /* Core Layout Styles */
+  .exam-shell { max-width: 720px; margin: 0 auto; position: relative; }
+  .exam-progress-track { height: 6px; background: var(--line); border-radius: 4px; overflow: hidden; margin-bottom: 2rem; }
+  .exam-progress-fill { height: 100%; background: var(--teal); width: 0%; transition: width .25s ease; }
+  .exam-meta { display: flex; justify-content: space-between; align-items: center; color: var(--slate); font-size: .9rem; margin-bottom: .6rem; }
+  
+  .q-card { display: none; }
+  .q-card.active { display: block; }
+  
+  .q-option {
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    padding: .9rem 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: .8rem;
+    cursor: pointer;
+    margin-bottom: .7rem;
+    transition: border-color .15s ease, background .15s ease;
+  }
+  .q-option:hover { border-color: var(--teal); }
+  .q-option input { accent-color: var(--teal); }
+  .q-option.selected { border-color: var(--teal); background: var(--teal-light); }
+
+  /* Exam Review Highlight Styles */
+  .review-box {
+    background: #f8f9fa;
+    border-left: 4px solid var(--teal);
+    padding: 1rem 1.25rem;
+    margin-top: 1.5rem;
+    border-radius: 6px;
+  }
+
+  /* Navigation & Question Dots */
+  .exam-nav-btns { display: flex; justify-content: space-between; margin-top: 1.6rem; }
+  .q-dots { display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: 1.8rem; }
+  .q-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--line); border: none; cursor: pointer; }
+  .q-dot.answered { background: var(--teal); }
+  .q-dot.current { outline: 2px solid var(--coral); outline-offset: 2px; }
 </style>
 {% endblock %}
 
 {% block content %}
+<!-- Watermark -->
+<div class="watermark">NDAEB PRACTICE</div>
+
 <div class="exam-shell">
-  <h3 class="fw-bold mb-1">NDAEB Practice Assessment</h3>
-  <p style="color:var(--slate);" class="mb-4">Answer each question, then move to the next. You can go back at any point before submitting.</p>
-
-  {% if questions %}
-  <form method="POST" action="{% url 'submit_exam' %}" id="examForm">
-    {% csrf_token %}
-
-    <div class="exam-meta">
-      <span id="qPositionLabel">Question 1 of {{ questions|length }}</span>
-      <span id="qAnsweredLabel">0 answered</span>
+  {% if is_review %}
+    <!-- ==========================================
+         SINGLE PAGE REVIEW MODE 
+         ========================================== -->
+    <div class="surface-card p-4 mb-4 text-center shadow-sm">
+      <h4 class="fw-bold mb-1">Assessment Review</h4>
+      <p class="fs-5 mb-0">
+        Score: <strong class="text-teal">{{ score }} / {{ total }}</strong> ({{ percentage }}%)
+      </p>
     </div>
-    <div class="exam-progress-track">
-      <div class="exam-progress-fill" id="progressFill"></div>
-    </div>
-    <div class="q-dots" id="qDots"></div>
 
-    {% for question in questions %}
-      <div class="q-card {% if forloop.first %}active{% endif %}" data-index="{{ forloop.counter0 }}" id="q-{{ question.id }}">
-        <div class="surface-card p-4 mb-3">
-          <h5 class="fw-bold mb-4">{{ question.question }}</h5>
-          <label class="q-option">
-            <input type="radio" name="question_{{ question.id }}" value="A">
-            <span><strong>A.</strong> {{ question.option_a }}</span>
-          </label>
-          <label class="q-option">
-            <input type="radio" name="question_{{ question.id }}" value="B">
-            <span><strong>B.</strong> {{ question.option_b }}</span>
-          </label>
-          <label class="q-option">
-            <input type="radio" name="question_{{ question.id }}" value="C">
-            <span><strong>C.</strong> {{ question.option_c }}</span>
-          </label>
-          <label class="q-option">
-            <input type="radio" name="question_{{ question.id }}" value="D">
-            <span><strong>D.</strong> {{ question.option_d }}</span>
-          </label>
-        </div>
-        <div class="exam-nav-btns">
-          <button type="button" class="btn btn-outline-teal prev-btn" {% if forloop.first %}disabled{% endif %}>Previous</button>
-          {% if forloop.last %}
-            <button type="submit" class="btn btn-coral">Submit completed assessment</button>
-          {% else %}
-            <button type="button" class="btn btn-primary next-btn">Next question</button>
+    {% if questions %}
+      {% for question in questions %}
+        <div class="surface-card p-4 mb-4 shadow-sm" style="border-left: 5px solid {% if question.user_answer == question.correct_option %}#198754{% else %}#dc3545{% endif %};">
+          <h5 class="fw-bold mb-4">Question {{ forloop.counter }}: {{ question.question }}</h5>
+          
+          <div class="mb-3" style="font-size: 1.05rem;">
+            <p class="mb-2">
+              <strong>Your option:</strong> 
+              {% if not question.user_answer %}
+                <span style="color: #dc3545; font-weight: bold;">No Answer</span>
+              {% else %}
+                <span style="color: {% if question.user_answer == question.correct_option %}#198754{% else %}#dc3545{% endif %};">
+                  Option {{ question.user_answer }} 
+                  ({% if question.user_answer == 'A' %}{{ question.option_a }}
+                   {% elif question.user_answer == 'B' %}{{ question.option_b }}
+                   {% elif question.user_answer == 'C' %}{{ question.option_c }}
+                   {% elif question.user_answer == 'D' %}{{ question.option_d }}{% endif %})
+                </span>
+              {% endif %}
+            </p>
+            
+            <p class="mb-0">
+              <strong>Correct option:</strong> 
+              <span style="color: #198754;">
+                Option {{ question.correct_option }}
+                ({% if question.correct_option == 'A' %}{{ question.option_a }}
+                 {% elif question.correct_option == 'B' %}{{ question.option_b }}
+                 {% elif question.correct_option == 'C' %}{{ question.option_c }}
+                 {% elif question.correct_option == 'D' %}{{ question.option_d }}{% endif %})
+              </span>
+            </p>
+          </div>
+
+          {% if question.explanation %}
+            <div class="review-box mt-3">
+              <strong class="text-teal d-block mb-1">Explanation:</strong>
+              <p class="mb-0 text-secondary small">{{ question.explanation }}</p>
+            </div>
           {% endif %}
         </div>
+      {% endfor %}
+
+      <div class="text-center mt-5 mb-5">
+        <a href="{% url 'dashboard' %}" class="btn btn-coral btn-lg px-5">Return to Dashboard</a>
       </div>
-    {% endfor %}
-  </form>
+    {% endif %}
+
   {% else %}
-    <div class="alert alert-warning text-center">No questions found in the database.</div>
+    <!-- ==========================================
+         EXAM TAKING MODE (PAGINATED)
+         ========================================== -->
+    <h3 class="fw-bold mb-1">NDAEB Practice Assessment</h3>
+    <p style="color:var(--slate);" class="mb-4">
+      Answer each question, then move to the next. You can go back at any point before submitting.
+    </p>
+
+    {% if questions %}
+    <form method="POST" action="{% url 'submit_exam' %}" id="examForm">
+      {% csrf_token %}
+
+      <div class="exam-meta">
+        <span id="qPositionLabel">Question 1 of {{ questions|length }}</span>
+        <span id="qAnsweredLabel">0 answered</span>
+      </div>
+      <div class="exam-progress-track">
+        <div class="exam-progress-fill" id="progressFill"></div>
+      </div>
+      <div class="q-dots" id="qDots"></div>
+
+      {% for question in questions %}
+        <div class="q-card {% if forloop.first %}active{% endif %}" 
+             data-index="{{ forloop.counter0 }}" 
+             id="q-{{ question.id }}">
+          
+          <div class="surface-card p-4 mb-3 shadow-sm">
+            <h5 class="fw-bold mb-4">{{ question.question }}</h5>
+            
+            <label class="q-option">
+              <input type="radio" name="question_{{ question.id }}" value="A">
+              <span><strong>A.</strong> {{ question.option_a }}</span>
+            </label>
+
+            <label class="q-option">
+              <input type="radio" name="question_{{ question.id }}" value="B">
+              <span><strong>B.</strong> {{ question.option_b }}</span>
+            </label>
+
+            <label class="q-option">
+              <input type="radio" name="question_{{ question.id }}" value="C">
+              <span><strong>C.</strong> {{ question.option_c }}</span>
+            </label>
+
+            <label class="q-option">
+              <input type="radio" name="question_{{ question.id }}" value="D">
+              <span><strong>D.</strong> {{ question.option_d }}</span>
+            </label>
+          </div>
+
+          <div class="exam-nav-btns">
+            <button type="button" class="btn btn-outline-teal prev-btn" {% if forloop.first %}disabled{% endif %}>Previous</button>
+            
+            {% if forloop.last %}
+              <button type="submit" class="btn btn-coral">Submit completed assessment</button>
+            {% else %}
+              <button type="button" class="btn btn-primary next-btn">Next question</button>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </form>
+    {% else %}
+      <div class="alert alert-warning text-center">No questions found in the database.</div>
+    {% endif %}
   {% endif %}
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
-  var cards = Array.prototype.slice.call(document.querySelectorAll('.q-card'));
-  var total = cards.length;
-  var current = 0;
+  var isReview = {{ is_review|yesno:"true,false" }};
 
-  var dotsWrap = document.getElementById('qDots');
-  var dots = [];
-  if (dotsWrap) {
-    cards.forEach(function (card, i) {
-      var dot = document.createElement('button');
-      dot.type = 'button';
-      dot.className = 'q-dot' + (i === 0 ? ' current' : '');
-      dot.addEventListener('click', function () { goTo(i); });
-      dotsWrap.appendChild(dot);
-      dots.push(dot);
-    });
-  }
+  // Only run the pagination logic if we are NOT in review mode
+  if (!isReview) {
+    var cards = Array.prototype.slice.call(document.querySelectorAll('.q-card'));
+    var total = cards.length;
+    var current = 0;
+    var dotsWrap = document.getElementById('qDots');
+    var dots = [];
 
-  function isAnswered(card) {
-    return !!card.querySelector('input[type="radio"]:checked');
-  }
-
-  function refreshUI() {
-    var answered = cards.filter(isAnswered).length;
-    document.getElementById('qPositionLabel').textContent = 'Question ' + (current + 1) + ' of ' + total;
-    document.getElementById('qAnsweredLabel').textContent = answered + ' of ' + total + ' answered';
-    document.getElementById('progressFill').style.width = ((current + 1) / total * 100) + '%';
-    dots.forEach(function (dot, i) {
-      dot.classList.toggle('current', i === current);
-      dot.classList.toggle('answered', isAnswered(cards[i]));
-    });
-    cards[current].querySelectorAll('.q-option').forEach(function (opt) {
-      var input = opt.querySelector('input');
-      opt.classList.toggle('selected', input.checked);
-    });
-  }
-
-  function goTo(index) {
-    cards[current].classList.remove('active');
-    current = index;
-    cards[current].classList.add('active');
-    refreshUI();
-    window.scrollTo({top: 0, behavior: 'smooth'});
-  }
-
-  cards.forEach(function (card) {
-    card.querySelectorAll('.q-option input').forEach(function (input) {
-      input.addEventListener('change', function () {
-        card.querySelectorAll('.q-option').forEach(function (opt) {
-          opt.classList.toggle('selected', opt.querySelector('input').checked);
-        });
-        refreshUI();
+    if (dotsWrap) {
+      cards.forEach(function (card, i) {
+        var dot = document.createElement('button');
+        dot.type = 'button';
+        dot.className = 'q-dot' + (i === 0 ? ' current' : '');
+        dot.addEventListener('click', function () { goTo(i); });
+        dotsWrap.appendChild(dot);
+        dots.push(dot);
       });
-    });
-    var nextBtn = card.querySelector('.next-btn');
-    var prevBtn = card.querySelector('.prev-btn');
-    if (nextBtn) nextBtn.addEventListener('click', function () { goTo(current + 1); });
-    if (prevBtn) prevBtn.addEventListener('click', function () { goTo(current - 1); });
-  });
+    }
 
-  refreshUI();
+    function isAnswered(card) {
+      return !!card.querySelector('input[type="radio"]:checked');
+    }
+
+    function refreshUI() {
+      var answered = cards.filter(isAnswered).length;
+      document.getElementById('qPositionLabel').textContent = 'Question ' + (current + 1) + ' of ' + total;
+      document.getElementById('qAnsweredLabel').textContent = answered + ' of ' + total + ' answered';
+      document.getElementById('progressFill').style.width = ((current + 1) / total * 100) + '%';
+
+      dots.forEach(function (dot, i) {
+        dot.classList.toggle('current', i === current);
+        dot.classList.toggle('answered', isAnswered(cards[i]));
+      });
+
+      cards[current].querySelectorAll('.q-option').forEach(function (opt) {
+        var input = opt.querySelector('input');
+        opt.classList.toggle('selected', input.checked);
+      });
+    }
+
+    function goTo(index) {
+      cards[current].classList.remove('active');
+      current = index;
+      cards[current].classList.add('active');
+      refreshUI();
+      window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
+    cards.forEach(function (card) {
+      card.querySelectorAll('.q-option input').forEach(function (input) {
+        input.addEventListener('change', function () {
+          card.querySelectorAll('.q-option').forEach(function (opt) {
+            opt.classList.toggle('selected', opt.querySelector('input').checked);
+          });
+          refreshUI();
+        });
+      });
+
+      var nextBtn = card.querySelector('.next-btn');
+      var prevBtn = card.querySelector('.prev-btn');
+      if (nextBtn) nextBtn.addEventListener('click', function () { goTo(current + 1); });
+      if (prevBtn) prevBtn.addEventListener('click', function () { goTo(current - 1); });
+    });
+
+    refreshUI();
+  }
 </script>
 {% endblock %}

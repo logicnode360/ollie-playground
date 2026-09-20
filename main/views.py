@@ -14,7 +14,6 @@ def admin_login_view(request):
         u_name = request.POST.get('username')
         p_word = request.POST.get('password')
 
-        # Check for fixed admin password
         if p_word != 'oluchi@098321':
             messages.error(request, "Invalid administrator password.")
             return render(request, 'admin_login.html')
@@ -37,7 +36,7 @@ def index_view(request):
 
     if request.user.is_authenticated and not request.user.is_staff:
         return redirect('dashboard')
-    
+
     context = {
         'total_questions': Question.objects.count(),
     }
@@ -109,25 +108,57 @@ def exam_view(request):
         return redirect('dashboard')
 
     questions = Question.objects.all().order_by('id')
-    return render(request, 'exam.html', {'questions': questions})
+    return render(request, 'exam.html', {'questions': questions, 'is_review': False})
 
 @login_required
 def submit_exam_view(request):
     if request.method == "POST":
         questions = Question.objects.all()
         total = questions.count()
-        score = sum(1 for q in questions if request.POST.get(f"question_{q.id}") == q.correct_option)
+        score = 0
+        user_answers = {}
+
+        for q in questions:
+            selected = request.POST.get(f"question_{q.id}")
+            if selected:
+                user_answers[str(q.id)] = selected
+                if selected == q.correct_option:
+                    score += 1
+
         pct = (score / total * 100) if total > 0 else 0
 
-        ExamAttempt.objects.create(
+        attempt = ExamAttempt.objects.create(
             user=request.user,
             score=score,
             total_questions=total,
-            percentage=round(pct, 1)
+            percentage=round(pct, 1),
+            user_answers=user_answers
         )
+
         messages.success(request, f"Exam submitted! You scored {score}/{total} ({pct:.1f}%).")
-        return redirect('dashboard')
+        return redirect('exam_review', attempt_id=attempt.id)
+
     return redirect('exam')
+
+@login_required
+def exam_review_view(request, attempt_id):
+    """Displays the completed exam attempt in review mode."""
+    attempt = get_object_or_404(ExamAttempt, id=attempt_id, user=request.user)
+    questions = Question.objects.all().order_by('id')
+
+    # Attach user answer directly onto each question instance
+    for q in questions:
+        q.user_answer = attempt.user_answers.get(str(q.id))
+
+    context = {
+        'questions': questions,
+        'is_review': True,
+        'score': attempt.score,
+        'total': attempt.total_questions,
+        'percentage': attempt.percentage,
+        'attempt': attempt,
+    }
+    return render(request, 'exam.html', context)
 
 @user_passes_test(lambda u: u.is_staff, login_url='admin_login')
 def admin_panel_view(request):

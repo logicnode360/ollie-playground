@@ -13,4 +13,5 @@ urlpatterns = [
     path('submit-exam/', views.submit_exam_view, name='submit_exam'),
     path('admin-panel/', views.admin_panel_view, name='admin_panel'),
     path('admin-panel/payment/<int:profile_id>/<str:action>/', views.process_payment, name='process_payment'),
+    path('exam/review/<int:attempt_id>/', views.exam_review_view, name='exam_review'),
 ]
