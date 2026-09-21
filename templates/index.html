@@ -870,6 +870,43 @@
     .modal-close:hover {
       color: var(--navy);
     }
+
+    /* Video Modal */
+    .video-modal-content {
+      background: #000;
+      padding: 0;
+      border-radius: 14px;
+      width: 92%;
+      max-width: 860px;
+      position: relative;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+      overflow: hidden;
+    }
+
+    .video-modal-content .modal-close {
+      color: #fff;
+      top: 10px;
+      right: 14px;
+      z-index: 10;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+    }
+
+    .video-modal-content .modal-close:hover {
+      color: var(--gold);
+    }
+
+    .video-wrapper {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #000;
+    }
+
+    .video-wrapper video {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
   </style>
 </head>
 <body>
@@ -902,6 +939,7 @@
         <div class="hero-btns">
           <a href="#programs" class="btn btn-gold">Explore Programs</a>
           <a href="#" onclick="openModal('loginModal'); return false;" class="btn btn-outline-navy">Practice MCQs</a>
+          <br><a href="#" onclick="openVideoModal(); return false;" class="btn btn-outline-navy">Watch Tutorial</a>
           <a href="https://www.youtube.com/@licenseReadyWithOllie" target="_blank" rel="noopener" class="btn btn-outline-navy">Watch on YouTube</a>
         </div>
       </div>
@@ -1361,6 +1399,19 @@
     </div>
   </div>
 
+  <!-- Video Tutorial Modal -->
+  <div id="videoModal" class="modal-overlay">
+    <div class="modal-content video-modal-content">
+      <button class="modal-close" onclick="closeVideoModal()" aria-label="Close">&times;</button>
+      <div class="video-wrapper">
+        <video id="tutorialVideo" controls playsinline preload="none">
+          <source src="{% static 'main/video/0920.mp4' %}" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+      </div>
+    </div>
+  </div>
+
   <script>
     document.getElementById('year').textContent = new Date().getFullYear()
 
@@ -1407,11 +1458,27 @@
       document.body.style.overflow = '' // Restores scrolling
     }
 
+    // Video modal (pauses/resets video on close so it doesn't keep playing in background)
+    function openVideoModal() {
+      openModal('videoModal')
+    }
+
+    function closeVideoModal() {
+      var video = document.getElementById('tutorialVideo')
+      video.pause()
+      video.currentTime = 0
+      closeModal('videoModal')
+    }
+
     // Close modal if user clicks outside the modal box
     window.addEventListener('click', function (event) {
       if (event.target.classList.contains('modal-overlay')) {
-        event.target.classList.remove('active')
-        document.body.style.overflow = ''
+        if (event.target.id === 'videoModal') {
+          closeVideoModal()
+        } else {
+          event.target.classList.remove('active')
+          document.body.style.overflow = ''
+        }
       }
     })
   </script>
