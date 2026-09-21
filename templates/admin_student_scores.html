@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ student.username }}'s Scores — Admin{% endblock %}
+
+{% block layout %}
+<div class="container py-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold mb-0">Exam History: {{ student.username }}</h2>
+    <a href="{% url 'admin_panel' %}" class="btn btn-outline-secondary">← Back to Admin Panel</a>
+  </div>
+
+  <div class="surface-card">
+    <div class="p-4 pb-3">
+      <h5 class="fw-bold mb-0">{{ student.email }}</h5>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Date Taken</th>
+            <th>Score</th>
+            <th>Percentage</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for attempt in attempts %}
+            <tr>
+              <td>{{ attempt.date_taken|date:"M d, Y h:i A" }}</td>
+              <td>{{ attempt.score }} / {{ attempt.total_questions }}</td>
+              <td>
+                <span class="badge {% if attempt.percentage >= 70 %}bg-success{% else %}bg-danger{% endif %}">
+                  {{ attempt.percentage }}%
+                </span>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="3" class="text-center py-4 text-muted">This student has not taken any exams yet.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

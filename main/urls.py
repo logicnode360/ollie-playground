@@ -14,4 +14,7 @@ urlpatterns = [
     path('admin-panel/', views.admin_panel_view, name='admin_panel'),
     path('admin-panel/payment/<int:profile_id>/<str:action>/', views.process_payment, name='process_payment'),
     path('exam/review/<int:attempt_id>/', views.exam_review_view, name='exam_review'),
+    path('admin-panel/student/<int:user_id>/scores/', views.admin_student_scores_view, name='admin_student_scores'),
+    path('admin-panel/notification/<int:notification_id>/read/', views.mark_notification_read, name='mark_notification_read'),
+    path('admin-panel/notifications/read-all/', views.mark_all_notifications_read, name='mark_all_notifications_read'),
 ]

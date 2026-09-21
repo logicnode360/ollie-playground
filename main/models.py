@@ -26,6 +26,25 @@ class Profile(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.payment_status}"
 
+class Notification(models.Model):
+    """
+    Simple admin-facing notification feed. Not tied to a specific staff user,
+    since any staff member should be able to see/dismiss it — mirrors how
+    the pending_payments queue works (shared, not per-admin).
+    """
+    message = models.CharField(max_length=255)
+    link_name = models.CharField(max_length=100, blank=True, help_text="URL name to reverse for the 'view' link, e.g. 'admin_student_scores'.")
+    link_arg = models.PositiveIntegerField(null=True, blank=True, help_text="Single positional arg for link_name, e.g. a user id.")
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return self.message
+
+
 class ExamAttempt(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='attempts')
     score = models.IntegerField()

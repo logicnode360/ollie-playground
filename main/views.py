@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
-from .models import Question, ExamAttempt, Profile
+from .models import Question, ExamAttempt, Profile, Notification
 
 # --- ADMIN LOGIN VIEW ---
 def admin_login_view(request):
@@ -135,6 +135,12 @@ def submit_exam_view(request):
             user_answers=user_answers
         )
 
+        Notification.objects.create(
+            message=f"{request.user.username} completed the exam — scored {score}/{total} ({pct:.1f}%).",
+            link_name='admin_student_scores',
+            link_arg=request.user.id,
+        )
+
         messages.success(request, f"Exam submitted! You scored {score}/{total} ({pct:.1f}%).")
         return redirect('exam_review', attempt_id=attempt.id)
 
@@ -165,13 +171,39 @@ def admin_panel_view(request):
     pending_payments = Profile.objects.filter(payment_status='PENDING')
     approved_users = Profile.objects.filter(payment_status='APPROVED')
 
+    # Attach the latest score to each approved profile
+    for profile in approved_users:
+        latest_attempt = ExamAttempt.objects.filter(user=profile.user).order_by('-date_taken').first()
+        if latest_attempt:
+            profile.latest_score = latest_attempt.percentage
+        else:
+            profile.latest_score = None
+
+    notifications = Notification.objects.filter(is_read=False)[:10]
+
     context = {
         'total_questions': Question.objects.count(),
         'total_students': User.objects.filter(is_staff=False).count(),
         'pending_payments': pending_payments,
         'approved_users': approved_users,
+        'notifications': notifications,
+        'unread_notifications_count': Notification.objects.filter(is_read=False).count(),
     }
     return render(request, 'admin-panel.html', context)
+
+
+@user_passes_test(lambda u: u.is_staff, login_url='admin_login')
+def mark_notification_read(request, notification_id):
+    notification = get_object_or_404(Notification, id=notification_id)
+    notification.is_read = True
+    notification.save()
+    return redirect('admin_panel')
+
+
+@user_passes_test(lambda u: u.is_staff, login_url='admin_login')
+def mark_all_notifications_read(request):
+    Notification.objects.filter(is_read=False).update(is_read=True)
+    return redirect('admin_panel')
 
 @user_passes_test(lambda u: u.is_staff, login_url='admin_login')
 def process_payment(request, profile_id, action):
@@ -184,3 +216,15 @@ def process_payment(request, profile_id, action):
         messages.warning(request, f"Denied payment for {profile.user.username}.")
     profile.save()
     return redirect('admin_panel')
+
+@user_passes_test(lambda u: u.is_staff, login_url='admin_login')
+def admin_student_scores_view(request, user_id):
+    student = get_object_or_404(User, id=user_id)
+    # Fetch all attempts for this specific student, ordered by newest first
+    attempts = ExamAttempt.objects.filter(user=student).order_by('-date_taken')
+    
+    context = {
+        'student': student,
+        'attempts': attempts,
+    }
+    return render(request, 'admin_student_scores.html', context)
