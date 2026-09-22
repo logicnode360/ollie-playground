@@ -23,6 +23,13 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='UNPAID')
 
+    # Retake gating: student can always take the exam the first time.
+    # After each attempt, retake_approved flips to False, and the student
+    # must acknowledge they've reviewed their result, then wait for an
+    # admin to approve the retake before they can attempt again.
+    retake_approved = models.BooleanField(default=True)
+    retake_requested = models.BooleanField(default=False)
+
     def __str__(self):
         return f"{self.user.username} - {self.payment_status}"
 

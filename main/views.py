@@ -103,9 +103,22 @@ def confirm_payment_view(request):
 
 @login_required
 def exam_view(request):
-    if request.user.profile.payment_status != 'APPROVED':
+    profile = request.user.profile
+    if profile.payment_status != 'APPROVED':
         messages.error(request, "Your payment must be approved before you can start the exam.")
         return redirect('dashboard')
+
+    has_prior_attempt = ExamAttempt.objects.filter(user=request.user).exists()
+
+    # Only gate retakes -- first attempt is always allowed.
+    if has_prior_attempt and not profile.retake_approved:
+        latest_attempt = ExamAttempt.objects.filter(user=request.user).order_by('-date_taken').first()
+        context = {
+            'retake_locked': True,
+            'retake_requested': profile.retake_requested,
+            'latest_attempt': latest_attempt,
+        }
+        return render(request, 'exam.html', context)
 
     questions = Question.objects.all().order_by('id')
     return render(request, 'exam.html', {'questions': questions, 'is_review': False})
@@ -141,6 +154,12 @@ def submit_exam_view(request):
             link_arg=request.user.id,
         )
 
+        # Lock retakes until the student acknowledges review and an admin approves.
+        profile = request.user.profile
+        profile.retake_approved = False
+        profile.retake_requested = False
+        profile.save()
+
         messages.success(request, f"Exam submitted! You scored {score}/{total} ({pct:.1f}%).")
         return redirect('exam_review', attempt_id=attempt.id)
 
@@ -166,6 +185,24 @@ def exam_review_view(request, attempt_id):
     }
     return render(request, 'exam.html', context)
 
+@login_required
+def request_retake_view(request):
+    """Student confirms they've reviewed their last attempt and asks an admin to unlock a retake."""
+    if request.method == "POST":
+        profile = request.user.profile
+        if not profile.retake_approved and not profile.retake_requested:
+            profile.retake_requested = True
+            profile.save()
+
+            Notification.objects.create(
+                message=f"{request.user.username} reviewed their result and is requesting a retake.",
+                link_name='admin_student_scores',
+                link_arg=request.user.id,
+            )
+            messages.info(request, "Retake request sent. An admin will review and unlock it shortly.")
+    return redirect('exam')
+
+
 @user_passes_test(lambda u: u.is_staff, login_url='admin_login')
 def admin_panel_view(request):
     pending_payments = Profile.objects.filter(payment_status='PENDING')
@@ -180,6 +217,7 @@ def admin_panel_view(request):
             profile.latest_score = None
 
     notifications = Notification.objects.filter(is_read=False)[:10]
+    retake_requests = Profile.objects.filter(retake_requested=True)
 
     context = {
         'total_questions': Question.objects.count(),
@@ -188,6 +226,7 @@ def admin_panel_view(request):
         'approved_users': approved_users,
         'notifications': notifications,
         'unread_notifications_count': Notification.objects.filter(is_read=False).count(),
+        'retake_requests': retake_requests,
     }
     return render(request, 'admin-panel.html', context)
 
@@ -216,6 +255,20 @@ def process_payment(request, profile_id, action):
         messages.warning(request, f"Denied payment for {profile.user.username}.")
     profile.save()
     return redirect('admin_panel')
+
+@user_passes_test(lambda u: u.is_staff, login_url='admin_login')
+def process_retake(request, profile_id, action):
+    profile = get_object_or_404(Profile, id=profile_id)
+    if action == 'approve':
+        profile.retake_approved = True
+        profile.retake_requested = False
+        messages.success(request, f"Retake unlocked for {profile.user.username}.")
+    elif action == 'deny':
+        profile.retake_requested = False
+        messages.warning(request, f"Retake request denied for {profile.user.username}.")
+    profile.save()
+    return redirect('admin_panel')
+
 
 @user_passes_test(lambda u: u.is_staff, login_url='admin_login')
 def admin_student_scores_view(request, user_id):

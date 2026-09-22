@@ -366,6 +366,18 @@
         </div>
       </div>
 
+      <div class="row g-3 mb-4">
+        <div class="col-md-4">
+          <div class="metric-card">
+            <h6>Retake requests</h6>
+            <div class="val">{{ retake_requests|length }}</div>
+            <span class="trend-pill {% if retake_requests|length > 0 %}warn{% endif %}">
+              {% if retake_requests|length > 0 %}&#8599; Needs review{% else %}&#10003; All clear{% endif %}
+            </span>
+          </div>
+        </div>
+      </div>
+
       <div class="surface-card mb-4">
         <div class="p-4 pb-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
           <h5 class="fw-bold mb-0">Pending payment verification</h5>
@@ -395,6 +407,44 @@
               {% empty %}
                 <tr>
                   <td colspan="4" class="text-center py-4" style="color:var(--fin-slate);">No pending payment approvals at this time.</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="surface-card mb-4">
+        <div class="p-4 pb-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <h5 class="fw-bold mb-0">Retake requests</h5>
+          <span class="badge-soft-coral">{{ retake_requests|length }} waiting</span>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead>
+              <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Status</th>
+                <th class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for profile in retake_requests %}
+                <tr>
+                  <td>
+                    <a href="{% url 'admin_student_scores' profile.user.id %}" class="text-decoration-none fw-bold" style="color: var(--fin-ink);">{{ profile.user.username }}</a>
+                  </td>
+                  <td>{{ profile.user.email }}</td>
+                  <td><span class="badge-soft-coral">Awaiting approval</span></td>
+                  <td class="text-end">
+                    <a href="{% url 'process_retake' profile.id 'approve' %}" class="btn btn-ink btn-sm me-2">Unlock retake</a>
+                    <a href="{% url 'process_retake' profile.id 'deny' %}" class="btn btn-outline-ink btn-sm">Deny</a>
+                  </td>
+                </tr>
+              {% empty %}
+                <tr>
+                  <td colspan="4" class="text-center py-4" style="color:var(--fin-slate);">No retake requests at this time.</td>
                 </tr>
               {% endfor %}
             </tbody>
