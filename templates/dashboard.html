@@ -104,6 +104,7 @@
             <th>Date</th>
             <th>Score</th>
             <th>Percentage</th>
+            <th>Time Spent</th>
             <th>Result</th>
           </tr>
         </thead>
@@ -113,6 +114,7 @@
               <td>{{ attempt.date_taken|date:'M d, Y - H:i' }}</td>
               <td>{{ attempt.score }} / {{ attempt.total_questions }}</td>
               <td>{{ attempt.percentage }}%</td>
+              <td>{{ attempt.time_taken_display|default:"—" }}</td>
               <td>
                 {% if attempt.percentage >= 60 %}
                   <span class="badge-soft-teal">Passed</span>
@@ -123,7 +125,7 @@
             </tr>
           {% empty %}
             <tr>
-              <td colspan="4" class="text-center py-4" style="color:var(--slate);">You haven't attempted a practice exam yet — your results will show up here.</td>
+              <td colspan="5" class="text-center py-4" style="color:var(--slate);">You haven't attempted a practice exam yet — your results will show up here.</td>
             </tr>
           {% endfor %}
         </tbody>

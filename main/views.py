@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
+from django.utils import timezone
 from .models import Question, ExamAttempt, Profile, Notification
 
 # --- ADMIN LOGIN VIEW ---
@@ -140,12 +141,24 @@ def submit_exam_view(request):
 
         pct = (score / total * 100) if total > 0 else 0
 
+        time_taken_seconds = None
+        started_at_ms = request.POST.get('exam_started_at_ms')
+        if started_at_ms:
+            try:
+                started_at_ms = float(started_at_ms)
+                elapsed_ms = timezone.now().timestamp() * 1000 - started_at_ms
+                # Clamp to a sane range: never negative, never past the exam's own time limit.
+                time_taken_seconds = max(0, min(int(elapsed_ms / 1000), 60 * 60))
+            except (TypeError, ValueError):
+                time_taken_seconds = None
+
         attempt = ExamAttempt.objects.create(
             user=request.user,
             score=score,
             total_questions=total,
             percentage=round(pct, 1),
-            user_answers=user_answers
+            user_answers=user_answers,
+            time_taken_seconds=time_taken_seconds,
         )
 
         Notification.objects.create(
@@ -268,6 +281,30 @@ def process_retake(request, profile_id, action):
         messages.warning(request, f"Retake request denied for {profile.user.username}.")
     profile.save()
     return redirect('admin_panel')
+
+
+@user_passes_test(lambda u: u.is_staff, login_url='admin_login')
+def admin_attempt_review_view(request, attempt_id):
+    """Lets an admin view a specific student's exam attempt in the same
+    review layout students see — their chosen option, the correct option,
+    and the explanation for each question."""
+    attempt = get_object_or_404(ExamAttempt, id=attempt_id)
+    questions = Question.objects.all().order_by('id')
+
+    for q in questions:
+        q.user_answer = attempt.user_answers.get(str(q.id))
+
+    context = {
+        'questions': questions,
+        'is_review': True,
+        'score': attempt.score,
+        'total': attempt.total_questions,
+        'percentage': attempt.percentage,
+        'attempt': attempt,
+        'is_admin_view': True,
+        'reviewed_student': attempt.user,
+    }
+    return render(request, 'exam.html', context)
 
 
 @user_passes_test(lambda u: u.is_staff, login_url='admin_login')

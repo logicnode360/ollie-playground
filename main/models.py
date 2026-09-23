@@ -59,6 +59,13 @@ class ExamAttempt(models.Model):
     percentage = models.FloatField()
     user_answers = models.JSONField(default=dict, blank=True)  # Stores {"question_id": "selected_option"}
     date_taken = models.DateTimeField(auto_now_add=True)
+    time_taken_seconds = models.PositiveIntegerField(null=True, blank=True, help_text="Wall-clock time from exam start to submission, in seconds.")
+
+    def time_taken_display(self):
+        if self.time_taken_seconds is None:
+            return None
+        minutes, seconds = divmod(self.time_taken_seconds, 60)
+        return f"{minutes}m {seconds:02d}s"
 
     def __str__(self):
         return f"{self.user.username} - {self.score}/{self.total_questions} ({self.date_taken.strftime('%Y-%m-%d')})"

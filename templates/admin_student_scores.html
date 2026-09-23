@@ -20,6 +20,8 @@
             <th>Date Taken</th>
             <th>Score</th>
             <th>Percentage</th>
+            <th>Time Spent</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -32,10 +34,14 @@
                   {{ attempt.percentage }}%
                 </span>
               </td>
+              <td>{{ attempt.time_taken_display|default:"—" }}</td>
+              <td class="text-end">
+                <a href="{% url 'admin_attempt_review' attempt.id %}" class="btn btn-sm btn-outline-teal">View Answers</a>
+              </td>
             </tr>
           {% empty %}
             <tr>
-              <td colspan="3" class="text-center py-4 text-muted">This student has not taken any exams yet.</td>
+              <td colspan="5" class="text-center py-4 text-muted">This student has not taken any exams yet.</td>
             </tr>
           {% endfor %}
         </tbody>

@@ -161,10 +161,17 @@
          SINGLE PAGE REVIEW MODE 
          ========================================== -->
     <div class="surface-card p-4 mb-4 text-center shadow-sm">
-      <h4 class="fw-bold mb-1">Assessment Review</h4>
+      {% if is_admin_view %}
+        <h4 class="fw-bold mb-1">Reviewing {{ reviewed_student.username }}'s Attempt</h4>
+      {% else %}
+        <h4 class="fw-bold mb-1">Assessment Review</h4>
+      {% endif %}
       <p class="fs-5 mb-0">
         Score: <strong class="text-teal">{{ score }} / {{ total }}</strong> ({{ percentage }}%)
       </p>
+      {% if attempt.time_taken_display %}
+        <p class="mb-0" style="color:var(--slate);">Time spent: <strong>{{ attempt.time_taken_display }}</strong></p>
+      {% endif %}
     </div>
 
     {% if questions %}
@@ -209,14 +216,25 @@
         </div>
       {% endfor %}
 
-      <div class="text-center mt-5 mb-5">
-        <a href="{% url 'dashboard' %}" class="btn btn-coral btn-lg px-5">Return to Dashboard</a>
-      </div>
+      {% if is_admin_view %}
+        <div class="text-center mt-5 mb-5">
+          <a href="{% url 'admin_student_scores' reviewed_student.id %}" class="btn btn-coral btn-lg px-5">← Back to {{ reviewed_student.username }}'s Scores</a>
+        </div>
 
-      <!-- Always-visible floating shortcut so you don't have to scroll to the bottom -->
-      <a href="{% url 'dashboard' %}" class="btn btn-coral floating-dashboard-btn">
-        ↩ Dashboard
-      </a>
+        <!-- Always-visible floating shortcut so you don't have to scroll to the bottom -->
+        <a href="{% url 'admin_student_scores' reviewed_student.id %}" class="btn btn-coral floating-dashboard-btn">
+          ↩ Back to Scores
+        </a>
+      {% else %}
+        <div class="text-center mt-5 mb-5">
+          <a href="{% url 'dashboard' %}" class="btn btn-coral btn-lg px-5">Return to Dashboard</a>
+        </div>
+
+        <!-- Always-visible floating shortcut so you don't have to scroll to the bottom -->
+        <a href="{% url 'dashboard' %}" class="btn btn-coral floating-dashboard-btn">
+          ↩ Dashboard
+        </a>
+      {% endif %}
     {% endif %}
 
   {% else %}
@@ -231,6 +249,7 @@
     {% if questions %}
     <form method="POST" action="{% url 'submit_exam' %}" id="examForm">
       {% csrf_token %}
+      <input type="hidden" name="exam_started_at_ms" id="examStartedAtMs" value="">
 
       <div class="exam-meta">
         <span id="qPositionLabel">Question 1 of {{ questions|length }}</span>
@@ -367,6 +386,10 @@
     var EXAM_DURATION_SECONDS = 60 * 60;// 1 hour
     var timerEl = document.getElementById('examTimer');
     var examForm = document.getElementById('examForm');
+    var examStartedAtInput = document.getElementById('examStartedAtMs');
+    if (examStartedAtInput) {
+      examStartedAtInput.value = Date.now();
+    }
     var endTime = Date.now() + EXAM_DURATION_SECONDS * 1000;
     var timerInterval = null;
     var hasSubmitted = false;
