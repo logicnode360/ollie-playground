@@ -120,9 +120,8 @@
   OLLIE <br>
   NDAEB <br> PRACTICE <br>
   OLLIE <br>
-  NDAEB <br> PRACTICE</div>
-<div class="watermark" style="text-align: center;">
-  </div>
+  NDAEB <br> PRACTICE
+</div>
 
 <div class="exam-shell">
   {% if retake_locked %}
@@ -249,6 +248,7 @@
     {% if questions %}
     <form method="POST" action="{% url 'submit_exam' %}" id="examForm">
       {% csrf_token %}
+      <input type="hidden" name="week" value="{{ selected_week }}">
       <input type="hidden" name="exam_started_at_ms" id="examStartedAtMs" value="">
 
       <div class="exam-meta">
@@ -383,7 +383,7 @@
     // ==========================================
     // Exam Timer (60 minutes)
     // ==========================================
-    var EXAM_DURATION_SECONDS = 60 * 60;// 1 hour
+    var EXAM_DURATION_SECONDS = 60 * 60; // 1 hour
     var timerEl = document.getElementById('examTimer');
     var examForm = document.getElementById('examForm');
     var examStartedAtInput = document.getElementById('examStartedAtMs');

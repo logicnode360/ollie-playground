@@ -1,7 +1,12 @@
+# models.py
 from django.db import models
 from django.contrib.auth.models import User
 
 class Question(models.Model):
+    WEEK_CHOICES = [
+        ('week1', 'Week 1'),
+        ('week2', 'Week 2'),
+    ]
     question = models.TextField()
     option_a = models.CharField(max_length=255)
     option_b = models.CharField(max_length=255)
@@ -9,9 +14,10 @@ class Question(models.Model):
     option_d = models.CharField(max_length=255)
     correct_option = models.CharField(max_length=1, choices=[('A', 'A'), ('B', 'B'), ('C', 'C'), ('D', 'D')])
     explanation = models.TextField(blank=True, help_text="Key note explanation shown during review.")
+    week = models.CharField(max_length=10, choices=WEEK_CHOICES, default='week1')
 
     def __str__(self):
-        return f"Q{self.id}: {self.question[:50]}"
+        return f"[{self.week.upper()}] Q{self.id}: {self.question[:50]}"
 
 class Profile(models.Model):
     PAYMENT_STATUS_CHOICES = [
@@ -22,11 +28,6 @@ class Profile(models.Model):
     ]
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='UNPAID')
-
-    # Retake gating: student can always take the exam the first time.
-    # After each attempt, retake_approved flips to False, and the student
-    # must acknowledge they've reviewed their result, then wait for an
-    # admin to approve the retake before they can attempt again.
     retake_approved = models.BooleanField(default=True)
     retake_requested = models.BooleanField(default=False)
 
@@ -34,11 +35,6 @@ class Profile(models.Model):
         return f"{self.user.username} - {self.payment_status}"
 
 class Notification(models.Model):
-    """
-    Simple admin-facing notification feed. Not tied to a specific staff user,
-    since any staff member should be able to see/dismiss it — mirrors how
-    the pending_payments queue works (shared, not per-admin).
-    """
     message = models.CharField(max_length=255)
     link_name = models.CharField(max_length=100, blank=True, help_text="URL name to reverse for the 'view' link, e.g. 'admin_student_scores'.")
     link_arg = models.PositiveIntegerField(null=True, blank=True, help_text="Single positional arg for link_name, e.g. a user id.")
@@ -51,7 +47,6 @@ class Notification(models.Model):
     def __str__(self):
         return self.message
 
-
 class ExamAttempt(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='attempts')
     score = models.IntegerField()
@@ -60,6 +55,7 @@ class ExamAttempt(models.Model):
     user_answers = models.JSONField(default=dict, blank=True)  # Stores {"question_id": "selected_option"}
     date_taken = models.DateTimeField(auto_now_add=True)
     time_taken_seconds = models.PositiveIntegerField(null=True, blank=True, help_text="Wall-clock time from exam start to submission, in seconds.")
+    week = models.CharField(max_length=10, default='week1')
 
     def time_taken_display(self):
         if self.time_taken_seconds is None:
@@ -68,4 +64,4 @@ class ExamAttempt(models.Model):
         return f"{minutes}m {seconds:02d}s"
 
     def __str__(self):
-        return f"{self.user.username} - {self.score}/{self.total_questions} ({self.date_taken.strftime('%Y-%m-%d')})"
+        return f"{self.user.username} - [{self.week.upper()}] {self.score}/{self.total_questions} ({self.date_taken.strftime('%Y-%m-%d')})"
