@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 import os
+import dj_database_url
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -25,13 +26,7 @@ SECRET_KEY = 'django-insecure-)im4e=z9o3ei2i24ny3vf1v@6n^qh1s!b!+2571kmj8zaebb0z
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [
-    ".railway.app",               # Handles older/legacy Railway domains
-    ".up.railway.app",            # Handles newer Railway production domains
-    "healthcheck.railway.app",    # Critical for Railway's automated uptime monitoring
-    "localhost", 
-    "127.0.0.1"
-]
+ALLOWED_HOSTS = ['.up.railway.app', 'localhost', '127.0.0.1']
 
 # Application definition
 
@@ -80,12 +75,11 @@ WSGI_APPLICATION = 'ollie_playground.wsgi.application'
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        conn_max_age=600,
+    )
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/6.1/ref/settings/#auth-password-validators
@@ -121,8 +115,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
-STATIC_URL = "static/"
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 
 # Email
@@ -136,8 +130,4 @@ MAILERS = {
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
-CSRF_TRUSTED_ORIGINS = [
-    "https://ollie-playground-production.up.railway.app",
-    "https://*.up.railway.app",  # Wildcard covering preview/staging builds
-    "https://*.railway.app",     # Wildcard covering legacy domains
-]
+CSRF_TRUSTED_ORIGINS = ['https://*.up.railway.app']

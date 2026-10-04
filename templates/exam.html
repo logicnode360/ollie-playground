@@ -143,6 +143,13 @@
         </a>
       {% endif %}
 
+      {% if retake_denied and not retake_requested %}
+        <div class="alert alert-danger text-start">
+          <strong>Request denied.</strong> An admin declined your last retake request, so the exam stays locked.
+          Spend more time on your review, then send a new request below.
+        </div>
+      {% endif %}
+
       {% if retake_requested %}
         <div class="alert alert-info mb-0">
           <strong>Request sent.</strong> Waiting on an admin to approve your retake — check back soon.
