@@ -20,7 +20,7 @@
   "model": "auth.user",
   "fields": {
     "password": "pbkdf2_sha256$1500000$UMO9VJxTIIcohFttvLqcgX$JP6JgXa0dHNwpFoM992q5S5IGpgThx7Yoa6eMywOWWM=",
-    "last_login": "2026-10-04T14:23:02.906Z",
+    "last_login": "2026-10-04T16:49:16.371Z",
     "is_superuser": true,
     "username": "Oluchi",
     "first_name": "",
@@ -82,6 +82,14 @@
     "date_joined": "2026-09-27T20:21:31.074Z",
     "groups": [],
     "user_permissions": []
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "6dvr9igem9ps1p4sqv1i67se049ermho",
+  "fields": {
+    "session_data": ".eJxVjEEOwiAURO_C2hCgwO936b5nIPABqRpISrsy3t026UJ3k3lv5s2c39bitp4WN0d2ZYpdfrvg6ZnqAeLD13vj1Oq6zIEfCj9p51OL6XU73b-D4nvZ1yIAoSZUSFZmYW2KPigNwsgRDJjsabQWMRsIRmQFGochYpQ0YN4D-3wBzYI3Ow:1xDPOm:jDwhSj66zrKhNYFGGBt150nv86XORltj8wbFdBzVfqw",
+    "expire_date": "2026-10-18T16:49:16.392Z"
   }
 },
 {
@@ -172,7 +180,7 @@
     "option_c": "Root surfaces receive less fluoride because they are located below the occlusal plane",
     "option_d": "Cementum is more highly mineralized and therefore traps cariogenic bacteria more effectively",
     "correct_option": "A",
-    "explanation": "Cementum and dentin have lower mineral content than enamel and demineralize at higher pH levels (6.0–6.7 vs 5.5 for enamel).",
+    "explanation": "Cementum and dentin have lower mineral content than enamel and demineralize at higher pH levels (6.0â€“6.7 vs 5.5 for enamel).",
     "week": "week2"
   }
 },
@@ -306,7 +314,7 @@
   "model": "main.question",
   "pk": 12,
   "fields": {
-    "question": "A 48-year-old patient has generalized inflammation, several 6-mm probing depths and radiographic interproximal bone loss. Another patient in the next operatory has similarly red gingiva and bleeding during probing but probing depths of 2–3 mm and no attachment or bone loss. Which finding most clearly separates the first patient's disease process from gingivitis?",
+    "question": "A 48-year-old patient has generalized inflammation, several 6-mm probing depths and radiographic interproximal bone loss. Another patient in the next operatory has similarly red gingiva and bleeding during probing but probing depths of 2â€“3 mm and no attachment or bone loss. Which finding most clearly separates the first patient's disease process from gingivitis?",
     "option_a": "Gingival redness",
     "option_b": "Bleeding during probing",
     "option_c": "Loss of supporting periodontal attachment and alveolar bone",
@@ -760,7 +768,7 @@
     "option_c": "Brush immediately but avoid flossing for 30 minutes",
     "option_d": "Rinse repeatedly with hot water to distribute the varnish",
     "correct_option": "B",
-    "explanation": "To ensure maximum uptake, patients receiving fluoride varnish should avoid hard foods, hot liquids, alcohol, and brushing/flossing for 4–6 hours.",
+    "explanation": "To ensure maximum uptake, patients receiving fluoride varnish should avoid hard foods, hot liquids, alcohol, and brushing/flossing for 4â€“6 hours.",
     "week": "week2"
   }
 },
@@ -816,7 +824,7 @@
     "option_c": "Apply more sealant to compensate for the contamination",
     "option_d": "Cure the enamel first and then place sealant",
     "correct_option": "B",
-    "explanation": "If saliva contacts etched enamel, the surface must be re-etched for 10–15 seconds, rinsed, and dried before applying sealant.",
+    "explanation": "If saliva contacts etched enamel, the surface must be re-etched for 10â€“15 seconds, rinsed, and dried before applying sealant.",
     "week": "week2"
   }
 },
@@ -900,7 +908,7 @@
     "option_c": "Dry-mouth level associated with high caries risk",
     "option_d": "An uninterpretable result because collection exceeded 3 minutes",
     "correct_option": "C",
-    "explanation": "A stimulated salivary flow rate below 0.5–0.7 mL/min (or significantly below normal physiological rates, such as 2.5 mL per 5 mins equivalent to 0.5 mL/min) indicates a dry-mouth level that greatly increases caries risk.",
+    "explanation": "A stimulated salivary flow rate below 0.5â€“0.7 mL/min (or significantly below normal physiological rates, such as 2.5 mL per 5 mins equivalent to 0.5 mL/min) indicates a dry-mouth level that greatly increases caries risk.",
     "week": "week1"
   }
 },
@@ -1236,7 +1244,7 @@
     "option_c": "Hematoma formation",
     "option_d": "Alveolar osteitis",
     "correct_option": "D",
-    "explanation": "Alveolar osteitis (dry socket) typically occurs 2–4 days post-extraction with severe, radiating pain caused by premature loss or dislodgement of the blood clot.",
+    "explanation": "Alveolar osteitis (dry socket) typically occurs 2â€“4 days post-extraction with severe, radiating pain caused by premature loss or dislodgement of the blood clot.",
     "week": "week1"
   }
 },
@@ -1264,7 +1272,7 @@
     "option_c": "Disinfected rather than sterilized because the required sterilization contact time was not met",
     "option_d": "Unprocessed because liquid chemicals cannot disinfect dental items",
     "correct_option": "C",
-    "explanation": "Glutaraldehyde functions as a high-level disinfectant at shorter exposure times (e.g., 20–90 mins) and requires up to 10 hours of immersion for full sporicidal sterilization.",
+    "explanation": "Glutaraldehyde functions as a high-level disinfectant at shorter exposure times (e.g., 20â€“90 mins) and requires up to 10 hours of immersion for full sporicidal sterilization.",
     "week": "week1"
   }
 },
@@ -1604,7 +1612,7 @@
   "model": "main.notification",
   "pk": 1,
   "fields": {
-    "message": "Blessing completed the exam — scored 1/50 (2.0%).",
+    "message": "Blessing completed the exam â€” scored 1/50 (2.0%).",
     "link_name": "admin_student_scores",
     "link_arg": 5,
     "is_read": false,
@@ -1615,7 +1623,7 @@
   "model": "main.notification",
   "pk": 2,
   "fields": {
-    "message": "Zyrok completed the exam — scored 1/50 (2.0%).",
+    "message": "Zyrok completed the exam â€” scored 1/50 (2.0%).",
     "link_name": "admin_student_scores",
     "link_arg": 4,
     "is_read": false,
@@ -1626,7 +1634,7 @@
   "model": "main.notification",
   "pk": 3,
   "fields": {
-    "message": "Zyrok completed the exam — scored 0/50 (0.0%).",
+    "message": "Zyrok completed the exam â€” scored 0/50 (0.0%).",
     "link_name": "admin_student_scores",
     "link_arg": 4,
     "is_read": false,
@@ -1637,7 +1645,7 @@
   "model": "main.notification",
   "pk": 4,
   "fields": {
-    "message": "Zyrok completed the exam — scored 0/50 (0.0%).",
+    "message": "Zyrok completed the exam â€” scored 0/50 (0.0%).",
     "link_name": "admin_student_scores",
     "link_arg": 4,
     "is_read": false,
@@ -1648,7 +1656,7 @@
   "model": "main.notification",
   "pk": 5,
   "fields": {
-    "message": "Zyrok completed the exam — scored 2/50 (4.0%).",
+    "message": "Zyrok completed the exam â€” scored 2/50 (4.0%).",
     "link_name": "admin_student_scores",
     "link_arg": 4,
     "is_read": false,
@@ -1659,7 +1667,7 @@
   "model": "main.notification",
   "pk": 6,
   "fields": {
-    "message": "Zyrok completed the exam — scored 0/50 (0.0%).",
+    "message": "Zyrok completed the exam â€” scored 0/50 (0.0%).",
     "link_name": "admin_student_scores",
     "link_arg": 4,
     "is_read": false,
@@ -1670,7 +1678,7 @@
   "model": "main.notification",
   "pk": 7,
   "fields": {
-    "message": "Zyrok completed the exam — scored 0/50 (0.0%).",
+    "message": "Zyrok completed the exam â€” scored 0/50 (0.0%).",
     "link_name": "admin_student_scores",
     "link_arg": 4,
     "is_read": false,
@@ -1692,7 +1700,7 @@
   "model": "main.notification",
   "pk": 9,
   "fields": {
-    "message": "Zyrok completed the exam — scored 1/50 (2.0%).",
+    "message": "Zyrok completed the exam â€” scored 1/50 (2.0%).",
     "link_name": "admin_student_scores",
     "link_arg": 4,
     "is_read": false,
@@ -1725,7 +1733,7 @@
   "model": "main.notification",
   "pk": 12,
   "fields": {
-    "message": "Zyrok completed the exam — scored 1/50 (2.0%).",
+    "message": "Zyrok completed the exam â€” scored 1/50 (2.0%).",
     "link_name": "admin_student_scores",
     "link_arg": 4,
     "is_read": false,
@@ -1747,7 +1755,7 @@
   "model": "main.notification",
   "pk": 14,
   "fields": {
-    "message": "Zyrok completed the exam — scored 1/50 (2.0%).",
+    "message": "Zyrok completed the exam â€” scored 1/50 (2.0%).",
     "link_name": "admin_student_scores",
     "link_arg": 4,
     "is_read": false,
