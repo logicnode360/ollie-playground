@@ -871,20 +871,6 @@
       color: var(--navy);
     }
 
-    /* Inline validation errors inside login / enrol modals (stay until closed or resubmitted) */
-    .modal-error {
-      background: #fdebea;
-      color: #9f2a1f;
-      border: 1.5px solid #f0b3ac;
-      border-left: 5px solid #d9392b;
-      border-radius: 8px;
-      padding: 0.75rem 1rem;
-      margin-bottom: 1rem;
-      font-size: 0.92rem;
-      font-weight: 600;
-      line-height: 1.45;
-    }
-
     /* Video Modal */
     .video-modal-content {
       background: #000;
@@ -1363,9 +1349,6 @@
     <div class="modal-content">
       <button class="modal-close" onclick="closeModal('loginModal')" aria-label="Close">&times;</button>
       <h2>Log In</h2>
-      {% for message in messages %}{% if 'login' in message.tags %}
-        <div class="modal-error" role="alert">{{ message }}</div>
-      {% endif %}{% endfor %}
       <form action="{% url 'login' %}" method="POST">
         {% csrf_token %}
         <div class="field">
@@ -1386,9 +1369,6 @@
     <div class="modal-content">
       <button class="modal-close" onclick="closeModal('enrollModal')" aria-label="Close">&times;</button>
       <h2>Enrol Now</h2>
-      {% for message in messages %}{% if 'enroll' in message.tags %}
-        <div class="modal-error" role="alert">{{ message }}</div>
-      {% endif %}{% endfor %}
       <form action="{% url 'enroll' %}" method="POST">
         {% csrf_token %}
         <div class="field">
@@ -1493,8 +1473,6 @@
     // Close modal if user clicks outside the modal box
     window.addEventListener('click', function (event) {
       if (event.target.classList.contains('modal-overlay')) {
-        // Don't dismiss a modal that is showing an error on a stray outside click; use the × button
-        if (event.target.querySelector('.modal-error')) return
         if (event.target.id === 'videoModal') {
           closeVideoModal()
         } else {
@@ -1502,11 +1480,6 @@
           document.body.style.overflow = ''
         }
       }
-    })
-
-    // Re-open the auth modal that has a server-side error so the message is visible
-    ;['loginModal', 'enrollModal'].forEach(function (id) {
-      if (document.querySelector('#' + id + ' .modal-error')) openModal(id)
     })
   </script>
 </body>

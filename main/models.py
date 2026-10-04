@@ -30,7 +30,6 @@ class Profile(models.Model):
     payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='UNPAID')
     retake_approved = models.BooleanField(default=True)
     retake_requested = models.BooleanField(default=False)
-    retake_denied = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.user.username} - {self.payment_status}"

@@ -16,16 +16,13 @@ def login_view(request):
     if request.method == "POST":
         u_name = request.POST.get('username')
         p_word = request.POST.get('password')
-        if not u_name or not p_word:
-            messages.error(request, "Please enter both your username and password.", extra_tags='login')
-            return redirect('index')
-
         user = authenticate(request, username=u_name, password=p_word)
         if user is not None:
             login(request, user)
             return redirect('dashboard')
-        messages.error(request, "Invalid username or password.", extra_tags='login')
-    return redirect('index')
+        else:
+            messages.error(request, "Invalid username or password.")
+    return render(request, 'index.html')
 
 def enroll_view(request):
     if request.method == "POST":
@@ -33,25 +30,8 @@ def enroll_view(request):
         email = request.POST.get('email')
         p_word = request.POST.get('password')
 
-        u_name = (u_name or '').strip()
-        email = (email or '').strip()
-        p_word = p_word or ''
-
-        errors = []
-        if not u_name:
-            errors.append("Please choose a username.")
-        elif User.objects.filter(username__iexact=u_name).exists():
-            errors.append("That username is already taken.")
-        if not email:
-            errors.append("Please enter your email address.")
-        elif User.objects.filter(email__iexact=email).exists():
-            errors.append("An account with that email already exists.")
-        if len(p_word) < 8:
-            errors.append("Password must be at least 8 characters long.")
-
-        if errors:
-            for err in errors:
-                messages.error(request, err, extra_tags='enroll')
+        if User.objects.filter(username=u_name).exists():
+            messages.error(request, "Username is already taken.")
             return redirect('index')
 
         user = User.objects.create_user(username=u_name, email=email, password=p_word)
@@ -142,7 +122,6 @@ def exam_view(request, week='week1'):
             'retake_locked': True,
             'retake_requested': profile.retake_requested,
             'latest_attempt': latest_attempt,
-            'retake_denied': profile.retake_denied,
             'selected_week': week,
         })
 
@@ -163,15 +142,6 @@ def exam_view(request, week='week1'):
 def submit_exam_view(request):
     if request.method == "POST":
         profile, _ = Profile.objects.get_or_create(user=request.user)
-
-        # Server-side lock: a locked student can't bypass the exam page by POSTing directly
-        if profile.payment_status != 'APPROVED':
-            messages.error(request, "Your access has not been approved yet.")
-            return redirect('dashboard')
-        if not profile.retake_approved:
-            messages.error(request, "Your exam is locked until an administrator approves your retake request.")
-            return redirect('exam')
-
         week = request.POST.get('week', 'week1')
         questions = Question.objects.filter(week=week)
         total_questions = questions.count()
@@ -215,7 +185,6 @@ def submit_exam_view(request):
         # Lock retakes until student reviews and requests approval
         profile.retake_approved = False
         profile.retake_requested = False
-        profile.retake_denied = False
         profile.save()
 
         messages.success(request, f"Exam submitted! You scored {correct_count}/{total_questions} ({round(percentage, 1)}%).")
@@ -248,16 +217,7 @@ def exam_review_view(request, attempt_id):
 def request_retake_view(request):
     if request.method == "POST":
         profile, _ = Profile.objects.get_or_create(user=request.user)
-
-        if profile.retake_approved:
-            messages.info(request, "Your exam is already unlocked.")
-            return redirect('dashboard')
-        if profile.retake_requested:
-            messages.info(request, "Your request is already waiting for admin approval.")
-            return redirect('exam')
-
         profile.retake_requested = True
-        profile.retake_denied = False
         profile.save()
 
         Notification.objects.create(
@@ -265,7 +225,6 @@ def request_retake_view(request):
             link_name='admin_panel',
         )
         messages.success(request, "Retake request sent to administrator.")
-        return redirect('exam')
     return redirect('dashboard')
 
 # --- ADMIN PANEL VIEWS ---
@@ -313,11 +272,9 @@ def process_retake(request, profile_id, action):
     if action == 'approve':
         profile.retake_approved = True
         profile.retake_requested = False
-        profile.retake_denied = False
         messages.success(request, f"Unlocked retake for {profile.user.username}.")
     elif action == 'deny':
         profile.retake_requested = False
-        profile.retake_denied = True
         messages.warning(request, f"Denied retake for {profile.user.username}.")
     profile.save()
     return redirect('admin_panel')
