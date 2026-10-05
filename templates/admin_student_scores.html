@@ -17,6 +17,8 @@
       <table class="table table-hover align-middle mb-0">
         <thead>
           <tr>
+            <th>#</th>
+            <th>Week</th>
             <th>Date Taken</th>
             <th>Score</th>
             <th>Percentage</th>
@@ -27,6 +29,12 @@
         <tbody>
           {% for attempt in attempts %}
             <tr>
+              <td>
+                <span class="badge bg-secondary">Attempt {{ forloop.counter }}</span>
+              </td>
+              <td>
+                <span class="badge bg-dark">{{ attempt.week|upper }}</span>
+              </td>
               <td>{{ attempt.date_taken|date:"M d, Y h:i A" }}</td>
               <td>{{ attempt.score }} / {{ attempt.total_questions }}</td>
               <td>
@@ -41,7 +49,7 @@
             </tr>
           {% empty %}
             <tr>
-              <td colspan="5" class="text-center py-4 text-muted">This student has not taken any exams yet.</td>
+              <td colspan="7" class="text-center py-4 text-muted">This student has not taken any exams yet.</td>
             </tr>
           {% endfor %}
         </tbody>
