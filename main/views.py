@@ -166,20 +166,24 @@ def submit_exam_view(request):
     if request.method == "POST":
         profile, _ = Profile.objects.get_or_create(user=request.user)
 
-        # Server-side lock: a locked student can't bypass the exam page by POSTing directly
         if profile.payment_status != 'APPROVED':
             messages.error(request, "Your access has not been approved yet.")
             return redirect('dashboard')
         if not profile.retake_approved:
             messages.error(request, "Your exam is locked until an administrator approves your retake request.")
-            return redirect('exam')
+            return redirect('dashboard')
 
-        week = request.POST.get('week', 'week1')
+        # --- FIX: normalize week so it can't silently fall back to week1 ---
+        week = (request.POST.get('week') or '').strip().lower()
+        if week not in ('week1', 'week2', 'week3'):
+            messages.error(request, f"Invalid exam week: {week!r}. Please start the exam again from the dashboard.")
+            return redirect('dashboard')
+
         questions = Question.objects.filter(week=week)
         total_questions = questions.count()
 
         if total_questions == 0:
-            messages.error(request, "No questions were found for this exam.")
+            messages.error(request, f"No questions were found for {week}.")
             return redirect('dashboard')
 
         correct_count = 0
@@ -194,7 +198,6 @@ def submit_exam_view(request):
 
         percentage = (correct_count / total_questions) * 100 if total_questions > 0 else 0
 
-        # Calculate time spent
         started_at_ms = request.POST.get('exam_started_at_ms')
         time_taken_seconds = None
         if started_at_ms:
@@ -211,16 +214,18 @@ def submit_exam_view(request):
             percentage=round(percentage, 1),
             user_answers=user_answers,
             time_taken_seconds=time_taken_seconds,
-            week=week
+            week=week,   # always week1 / week2 / week3
         )
 
-        # Lock retakes until student reviews and requests approval
         profile.retake_approved = False
         profile.retake_requested = False
         profile.retake_denied = False
         profile.save()
 
-        messages.success(request, f"Exam submitted! You scored {correct_count}/{total_questions} ({round(percentage, 1)}%).")
+        messages.success(
+            request,
+            f"Exam submitted! You scored {correct_count}/{total_questions} ({round(percentage, 1)}%)."
+        )
         return redirect('exam_review', attempt_id=attempt.id)
 
     return redirect('dashboard')

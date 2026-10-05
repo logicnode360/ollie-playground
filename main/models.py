@@ -14,7 +14,7 @@ class Question(models.Model):
     option_d = models.CharField(max_length=255)
     correct_option = models.CharField(max_length=1, choices=[('A', 'A'), ('B', 'B'), ('C', 'C'), ('D', 'D')])
     explanation = models.TextField(blank=True, help_text="Key note explanation shown during review.")
-    week = models.CharField(max_length=10, choices=WEEK_CHOICES, default='week1')
+    week = models.CharField(max_length=20, default='week1')
 
     def __str__(self):
         return f"[{self.week.upper()}] Q{self.id}: {self.question[:50]}"
