@@ -100,6 +100,7 @@ def dashboard_view(request):
     # Week-specific question counts (matches database 'week1', 'week2')
     w1_count = Question.objects.filter(week='week1').count()
     w2_count = Question.objects.filter(week='week2').count()
+    w3_count = Question.objects.filter(week='week3').count()
 
     context = {
         'payment_status': profile.payment_status,
@@ -108,6 +109,7 @@ def dashboard_view(request):
         'highest_score': round(highest_score, 1),
         'w1_count': w1_count,
         'w2_count': w2_count,
+        'w3_count': w3_count,
     }
     return render(request, 'dashboard.html', context)
 
