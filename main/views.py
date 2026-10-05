@@ -174,14 +174,21 @@ def submit_exam_view(request):
         if profile.payment_status != 'APPROVED':
             messages.error(request, "Your access has not been approved yet.")
             return redirect('dashboard')
-        if not profile.retake_approved:
-            messages.error(request, "Your exam is locked until an administrator approves your retake request.")
-            return redirect('dashboard')
 
-        # --- FIX: normalize week so it can't silently fall back to week1 ---
         week = (request.POST.get('week') or '').strip().lower()
         if week not in ('week1', 'week2', 'week3'):
-            messages.error(request, f"Invalid exam week: {week!r}. Please start the exam again from the dashboard.")
+            messages.error(request, "Invalid exam week. Please start again from the dashboard.")
+            return redirect('dashboard')
+
+        # Only block if they already took THIS week and are not unlocked
+        has_taken_this_week = ExamAttempt.objects.filter(
+            user=request.user, week=week
+        ).exists()
+        if has_taken_this_week and not profile.retake_approved:
+            messages.error(
+                request,
+                "Your exam is locked until an administrator approves your retake request."
+            )
             return redirect('dashboard')
 
         questions = Question.objects.filter(week=week)
@@ -219,9 +226,10 @@ def submit_exam_view(request):
             percentage=round(percentage, 1),
             user_answers=user_answers,
             time_taken_seconds=time_taken_seconds,
-            week=week,   # always week1 / week2 / week3
+            week=week,
         )
 
+        # Lock only future retakes of the same week
         profile.retake_approved = False
         profile.retake_requested = False
         profile.retake_denied = False
