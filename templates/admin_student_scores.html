@@ -30,7 +30,7 @@
           {% for attempt in attempts %}
             <tr>
               <td>
-                <span class="badge bg-secondary">Attempt {{ forloop.counter }}</span>
+                <span class="badge bg-secondary">Attempt {{ attempt.week_attempt_number }}</span>
               </td>
               <td>
                 <span class="badge bg-dark">{{ attempt.week|upper }}</span>

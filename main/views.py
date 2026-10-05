@@ -343,10 +343,26 @@ def process_retake(request, profile_id, action):
     return redirect('admin_panel')
 
 @user_passes_test(is_admin)
+@user_passes_test(is_admin)
 def admin_student_scores_view(request, user_id):
     student = get_object_or_404(User, id=user_id)
-    attempts = ExamAttempt.objects.filter(user=student).order_by('-date_taken')
-    return render(request, 'admin_student_scores.html', {'student': student, 'attempts': attempts})
+    attempts = list(
+        ExamAttempt.objects.filter(user=student).order_by('week', 'date_taken')
+    )
+
+    # Number attempts per week (1st, 2nd, 3rd time for that week)
+    week_counters = {}
+    for attempt in attempts:
+        week_counters[attempt.week] = week_counters.get(attempt.week, 0) + 1
+        attempt.week_attempt_number = week_counters[attempt.week]
+
+    # Show newest first on the page
+    attempts = list(reversed(attempts))
+
+    return render(request, 'admin_student_scores.html', {
+        'student': student,
+        'attempts': attempts,
+    })
 
 @user_passes_test(is_admin)
 def admin_attempt_review_view(request, attempt_id):
