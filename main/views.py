@@ -134,12 +134,17 @@ def exam_view(request, week='week1'):
         messages.error(request, "Your access has not been approved yet.")
         return redirect('dashboard')
 
-    # Question.week is stored lowercase ('week1' / 'week2'), so use it as-is
     db_week = week.lower()
 
-    # Check retake gate
-    if not profile.retake_approved:
-        latest_attempt = ExamAttempt.objects.filter(user=request.user, week=db_week).order_by('-date_taken').first()
+    # Only lock if this student has ALREADY taken THIS week before
+    has_taken_this_week = ExamAttempt.objects.filter(
+        user=request.user, week=db_week
+    ).exists()
+
+    if has_taken_this_week and not profile.retake_approved:
+        latest_attempt = ExamAttempt.objects.filter(
+            user=request.user, week=db_week
+        ).order_by('-date_taken').first()
         return render(request, 'exam.html', {
             'retake_locked': True,
             'retake_requested': profile.retake_requested,
@@ -152,7 +157,7 @@ def exam_view(request, week='week1'):
 
     if not questions.exists():
         messages.warning(request, f"No questions currently available for {db_week}.")
-        return redirect('dashboard')  # Return to dashboard if empty
+        return redirect('dashboard')
 
     return render(request, 'exam.html', {
         'questions': questions,
