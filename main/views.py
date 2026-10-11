@@ -97,10 +97,11 @@ def dashboard_view(request):
     attempts_count = attempts.count()
     highest_score = max([a.percentage for a in attempts], default=0)
 
-    # Week-specific question counts (matches database 'week1', 'week2')
+    # Week-specific question counts (matches database 'week1' to 'week4')
     w1_count = Question.objects.filter(week='week1').count()
     w2_count = Question.objects.filter(week='week2').count()
     w3_count = Question.objects.filter(week='week3').count()
+    w4_count = Question.objects.filter(week='week4').count()
 
     context = {
         'payment_status': profile.payment_status,
@@ -110,6 +111,7 @@ def dashboard_view(request):
         'w1_count': w1_count,
         'w2_count': w2_count,
         'w3_count': w3_count,
+        'w4_count': w4_count,
     }
     return render(request, 'dashboard.html', context)
 
@@ -176,7 +178,7 @@ def submit_exam_view(request):
             return redirect('dashboard')
 
         week = (request.POST.get('week') or '').strip().lower()
-        if week not in ('week1', 'week2', 'week3'):
+        if week not in ('week1', 'week2', 'week3', 'week4'):
             messages.error(request, "Invalid exam week. Please start again from the dashboard.")
             return redirect('dashboard')
 
