@@ -8,6 +8,7 @@ class Question(models.Model):
         ('week2', 'Week 2'),
         ('week3', 'Week 3'),
         ('week4', 'Week 4'),
+        ('week5', 'Week 5'),
     ]
     question = models.TextField()
     option_a = models.CharField(max_length=255)
