@@ -1,4 +1,7 @@
-$env:DATABASE_URL="postgresql://postgres:WYBkGHTOYUscswwZgFLRpjAznGKCYydy@mainline.proxy.rlwy.net:55942/railway"
+@echo off
+setlocal
+set DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@mainline.proxy.rlwy.net:55942/railway
 py manage.py migrate
 py manage.py load_questions
-Remove-Item Env:DATABASE_URL
+endlocal
+pause
