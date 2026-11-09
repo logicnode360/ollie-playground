@@ -78,6 +78,9 @@
             <a href="{% url 'exam_week' 'week7' %}" class="btn btn-primary btn-lg w-100">
               Start Week 7 Assessment ({{ w7_count }} Qs)
             </a>
+            <a href="{% url 'exam_week' 'week8' %}" class="btn btn-coral btn-lg w-100">
+              Start Week 8 Assessment ({{ w8_count }} Qs)
+            </a>
           {% else %}
             <button class="btn btn-secondary btn-lg w-100" disabled>Locked — payment required</button>
           {% endif %}
