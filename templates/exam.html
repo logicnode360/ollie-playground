@@ -260,7 +260,7 @@
 
       <div class="exam-meta">
         <span id="qPositionLabel">Question 1 of {{ questions|length }}</span>
-        <span class="exam-timer" id="examTimer">⏱ 60:00</span>
+        <span class="exam-timer" id="examTimer">⏱ {{ exam_duration_minutes|default:60 }}:00</span>
         <span id="qAnsweredLabel">0 answered</span>
       </div>
       <div class="exam-progress-track">
@@ -388,9 +388,9 @@
     refreshUI();
 
     // ==========================================
-    // Exam Timer (60 minutes)
+    // Exam Timer (minutes set by the view; 60 by default)
     // ==========================================
-    var EXAM_DURATION_SECONDS = 60 * 60; // 1 hour
+    var EXAM_DURATION_SECONDS = {{ exam_duration_minutes|default:60 }} * 60;
     var timerEl = document.getElementById('examTimer');
     var examForm = document.getElementById('examForm');
     var examStartedAtInput = document.getElementById('examStartedAtMs');
